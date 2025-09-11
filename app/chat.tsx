@@ -12,7 +12,7 @@ import {
   Image,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
-import { Send, ArrowLeft } from 'lucide-react-native';
+import { Send, ArrowLeft, Phone, Video, MoreVertical, Smile, Camera, Mic } from 'lucide-react-native';
 
 interface Message {
   id: string;
@@ -24,7 +24,9 @@ interface Message {
 
 const CONTACT_INFO = {
   name: 'Sarah Johnson',
+  username: '@sarah_j',
   avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+  isOnline: true,
 };
 
 const USER_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face';
@@ -33,13 +35,28 @@ export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
-      text: 'Hello! How can I help you today?',
+      text: 'Hey! Love your latest Zippclip! 🔥',
       isUser: false,
-      timestamp: new Date(),
+      timestamp: new Date(Date.now() - 300000),
+      avatar: CONTACT_INFO.avatar,
+    },
+    {
+      id: '2',
+      text: 'Thanks! Want to collab on the next one?',
+      isUser: true,
+      timestamp: new Date(Date.now() - 240000),
+      avatar: USER_AVATAR,
+    },
+    {
+      id: '3',
+      text: 'Absolutely! I have some great ideas',
+      isUser: false,
+      timestamp: new Date(Date.now() - 180000),
       avatar: CONTACT_INFO.avatar,
     },
   ]);
   const [inputText, setInputText] = useState<string>('');
+  const [isTyping, setIsTyping] = useState<boolean>(false);
   const flatListRef = useRef<FlatList>(null);
 
   const sendMessage = () => {
@@ -55,38 +72,75 @@ export default function ChatScreen() {
       setMessages(prev => [...prev, newMessage]);
       setInputText('');
 
-      // Simulate a response after a short delay
+      // Simulate typing and response
+      setIsTyping(true);
       setTimeout(() => {
+        setIsTyping(false);
+        const responses = [
+          'That sounds amazing! 🎬',
+          'Can\'t wait to see what we create together!',
+          'Let\'s make it viral! 🚀',
+          'Your creativity is inspiring! ✨',
+        ];
+        const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+        
         const responseMessage: Message = {
           id: (Date.now() + 1).toString(),
-          text: 'Thanks for your message! This is a demo response.',
+          text: randomResponse,
           isUser: false,
           timestamp: new Date(),
           avatar: CONTACT_INFO.avatar,
         };
         setMessages(prev => [...prev, responseMessage]);
-      }, 1000);
+      }, 2000);
     }
   };
 
-  const renderMessage = ({ item }: { item: Message }) => (
-    <View style={[styles.messageContainer, item.isUser ? styles.userMessage : styles.botMessage]}>
-      {!item.isUser && (
-        <Image source={{ uri: item.avatar }} style={styles.avatar} />
-      )}
-      <View style={[styles.messageBubble, item.isUser ? styles.userBubble : styles.botBubble]}>
-        <Text style={[styles.messageText, item.isUser ? styles.userText : styles.botText]}>
-          {item.text}
-        </Text>
-        <Text style={[styles.timestamp, item.isUser ? styles.userTimestamp : styles.botTimestamp]}>
-          {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-        </Text>
+  const renderMessage = ({ item, index }: { item: Message; index: number }) => {
+    const prevMessage = index > 0 ? messages[index - 1] : null;
+    const showAvatar = !item.isUser && (!prevMessage || prevMessage.isUser || 
+      item.timestamp.getTime() - prevMessage.timestamp.getTime() > 300000);
+    const isConsecutive = prevMessage && prevMessage.isUser === item.isUser && 
+      item.timestamp.getTime() - prevMessage.timestamp.getTime() < 60000;
+
+    return (
+      <View style={[styles.messageContainer, item.isUser ? styles.userMessage : styles.botMessage]}>
+        {!item.isUser && (
+          <View style={styles.avatarContainer}>
+            {showAvatar ? (
+              <Image source={{ uri: item.avatar }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatarSpacer} />
+            )}
+          </View>
+        )}
+        <View style={[styles.messageBubble, item.isUser ? styles.userBubble : styles.botBubble, isConsecutive && styles.consecutiveMessage]}>
+          <Text style={[styles.messageText, item.isUser ? styles.userText : styles.botText]}>
+            {item.text}
+          </Text>
+        </View>
       </View>
-      {item.isUser && (
-        <Image source={{ uri: item.avatar }} style={styles.avatar} />
-      )}
-    </View>
-  );
+    );
+  };
+
+  const renderTypingIndicator = () => {
+    if (!isTyping) return null;
+    
+    return (
+      <View style={[styles.messageContainer, styles.botMessage]}>
+        <View style={styles.avatarContainer}>
+          <Image source={{ uri: CONTACT_INFO.avatar }} style={styles.avatar} />
+        </View>
+        <View style={[styles.messageBubble, styles.botBubble, styles.typingBubble]}>
+          <View style={styles.typingIndicator}>
+            <View style={[styles.typingDot, { animationDelay: '0ms' }]} />
+            <View style={[styles.typingDot, { animationDelay: '150ms' }]} />
+            <View style={[styles.typingDot, { animationDelay: '300ms' }]} />
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   useEffect(() => {
     // Scroll to bottom when new messages are added
@@ -120,12 +174,31 @@ export default function ChatScreen() {
             </TouchableOpacity>
           ),
           headerTitle: () => (
-            <View style={styles.headerTitleContainer}>
+            <TouchableOpacity style={styles.headerTitleContainer}>
               <Image source={{ uri: CONTACT_INFO.avatar }} style={styles.headerAvatar} />
               <View style={styles.headerTextContainer}>
                 <Text style={styles.headerName}>{CONTACT_INFO.name}</Text>
-                <Text style={styles.headerStatus}>Online</Text>
+                <Text style={styles.headerUsername}>{CONTACT_INFO.username}</Text>
+                <View style={styles.statusContainer}>
+                  <View style={[styles.statusDot, CONTACT_INFO.isOnline && styles.onlineStatus]} />
+                  <Text style={styles.headerStatus}>
+                    {CONTACT_INFO.isOnline ? 'Active now' : 'Last seen recently'}
+                  </Text>
+                </View>
               </View>
+            </TouchableOpacity>
+          ),
+          headerRight: () => (
+            <View style={styles.headerActions}>
+              <TouchableOpacity style={styles.headerButton}>
+                <Phone size={22} color="#ffffff" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.headerButton}>
+                <Video size={22} color="#ffffff" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.headerButton}>
+                <MoreVertical size={22} color="#ffffff" />
+              </TouchableOpacity>
             </View>
           ),
         }} 
@@ -144,27 +217,43 @@ export default function ChatScreen() {
           style={styles.messagesList}
           contentContainerStyle={styles.messagesContent}
           showsVerticalScrollIndicator={false}
+          ListFooterComponent={renderTypingIndicator}
         />
         
         <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            value={inputText}
-            onChangeText={setInputText}
-            placeholder="Type a message..."
-            placeholderTextColor="#94a3b8"
-            multiline
-            maxLength={500}
-            onSubmitEditing={sendMessage}
-            blurOnSubmit={false}
-          />
-          <TouchableOpacity 
-            style={[styles.sendButton, inputText.trim() ? styles.sendButtonActive : styles.sendButtonInactive]}
-            onPress={sendMessage}
-            disabled={!inputText.trim()}
-          >
-            <Send size={20} color={inputText.trim() ? '#ffffff' : '#9ca3af'} />
-          </TouchableOpacity>
+          <View style={styles.inputRow}>
+            <TouchableOpacity style={styles.inputButton}>
+              <Camera size={24} color="#666" />
+            </TouchableOpacity>
+            <View style={styles.textInputContainer}>
+              <TextInput
+                style={styles.textInput}
+                value={inputText}
+                onChangeText={setInputText}
+                placeholder="Message..."
+                placeholderTextColor="#666"
+                multiline
+                maxLength={500}
+                onSubmitEditing={sendMessage}
+                blurOnSubmit={false}
+              />
+              <TouchableOpacity style={styles.emojiButton}>
+                <Smile size={20} color="#666" />
+              </TouchableOpacity>
+            </View>
+            {inputText.trim() ? (
+              <TouchableOpacity 
+                style={styles.sendButton}
+                onPress={sendMessage}
+              >
+                <Send size={20} color="#ffffff" />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={styles.inputButton}>
+                <Mic size={24} color="#666" />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -174,7 +263,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f172a',
+    backgroundColor: '#000',
   },
   backButton: {
     padding: 8,
@@ -192,7 +281,7 @@ const styles = StyleSheet.create({
   },
   messageContainer: {
     flexDirection: 'row',
-    marginVertical: 4,
+    marginVertical: 2,
     alignItems: 'flex-end',
   },
   userMessage: {
@@ -201,33 +290,39 @@ const styles = StyleSheet.create({
   botMessage: {
     justifyContent: 'flex-start',
   },
+  avatarContainer: {
+    width: 40,
+    alignItems: 'center',
+  },
   avatar: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    marginHorizontal: 8,
+  },
+  avatarSpacer: {
+    width: 32,
+    height: 32,
   },
   messageBubble: {
     maxWidth: '75%',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
+    marginHorizontal: 8,
+  },
+  consecutiveMessage: {
+    marginTop: 2,
   },
   userBubble: {
-    backgroundColor: '#0d9488',
-    borderBottomRightRadius: 4,
+    backgroundColor: '#14b8a6',
+    borderBottomRightRadius: 6,
   },
   botBubble: {
-    backgroundColor: '#1e293b',
-    borderBottomLeftRadius: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: '#1a1a1a',
+    borderBottomLeftRadius: 6,
+  },
+  typingBubble: {
+    paddingVertical: 16,
   },
   messageText: {
     fontSize: 16,
@@ -237,56 +332,69 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   botText: {
-    color: '#e2e8f0',
+    color: '#ffffff',
   },
-  timestamp: {
-    fontSize: 12,
-    marginTop: 4,
+  typingIndicator: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
   },
-  userTimestamp: {
-    color: 'rgba(255, 255, 255, 0.7)',
-  },
-  botTimestamp: {
-    color: '#94a3b8',
+  typingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#666',
   },
   inputContainer: {
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#1a1a1a',
+  },
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#1e293b',
-    borderTopWidth: 1,
-    borderTopColor: '#334155',
+    gap: 12,
   },
-  textInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: '#475569',
+  inputButton: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    maxHeight: 100,
-    backgroundColor: '#334155',
-    color: '#e2e8f0',
-    marginRight: 12,
-  },
-  sendButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendButtonActive: {
-    backgroundColor: '#0d9488',
+  textInputContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
   },
-  sendButtonInactive: {
-    backgroundColor: '#475569',
+  textInput: {
+    flex: 1,
+    fontSize: 16,
+    maxHeight: 100,
+    color: '#ffffff',
+    paddingVertical: 8,
+  },
+  emojiButton: {
+    padding: 8,
+  },
+  sendButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#14b8a6',
   },
   headerTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
   },
   headerAvatar: {
     width: 36,
@@ -302,9 +410,36 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
   },
-  headerStatus: {
-    color: '#0d9488',
-    fontSize: 12,
+  headerUsername: {
+    color: '#666',
+    fontSize: 14,
     marginTop: 2,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 2,
+  },
+  statusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#666',
+    marginRight: 6,
+  },
+  onlineStatus: {
+    backgroundColor: '#14b8a6',
+  },
+  headerStatus: {
+    color: '#666',
+    fontSize: 12,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  headerButton: {
+    padding: 8,
   },
 });
