@@ -15,6 +15,7 @@ import {
   TextInput,
   ScrollView,
   KeyboardAvoidingView,
+  RefreshControl,
 } from "react-native";
 import { Heart, MessageCircle, Share2, Bookmark, Music, Bell, X, Send, Zap } from "lucide-react-native";
 import { router } from "expo-router";
@@ -37,6 +38,7 @@ export default function HomeScreen() {
   const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
   const [commentText, setCommentText] = useState("");
   const [comments, setComments] = useState<Record<string, Array<{id: string, username: string, text: string, avatar: string}>>>({});
+  const [refreshing, setRefreshing] = useState(false);
   const likeAnimations = useRef<Map<string, Animated.Value>>(new Map());
 
   const viewabilityConfig = useRef({
@@ -173,6 +175,16 @@ export default function HomeScreen() {
       }
     ];
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    handleHaptic();
+    
+    setTimeout(() => {
+      console.log('Refreshed feed');
+      setRefreshing(false);
+    }, 1500);
+  }, []);
 
   const handleNavPress = (nav: string) => {
     handleHaptic();
@@ -330,6 +342,14 @@ export default function HomeScreen() {
         decelerationRate="fast"
         viewabilityConfig={viewabilityConfig}
         onViewableItemsChanged={onViewableItemsChanged}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14b8a6"
+            colors={["#14b8a6"]}
+          />
+        }
       />
       
       <Modal

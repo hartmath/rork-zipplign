@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -10,6 +10,7 @@ import {
   FlatList,
   Dimensions,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { Search, TrendingUp, Hash } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -24,6 +25,7 @@ const GRID_ITEM_WIDTH = (SCREEN_WIDTH - 3) / 3;
 export default function DiscoverScreen() {
   const insets = useSafeAreaInsets();
   const [searchQuery, setSearchQuery] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleHaptic = () => {
     if (Platform.OS !== 'web') {
@@ -40,6 +42,16 @@ export default function DiscoverScreen() {
     handleHaptic();
     router.push(`/video/${videoId}`);
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    handleHaptic();
+    
+    setTimeout(() => {
+      console.log('Refreshed discover content');
+      setRefreshing(false);
+    }, 1500);
+  }, []);
 
   const handleSearchPress = () => {
     handleHaptic();
@@ -84,7 +96,17 @@ export default function DiscoverScreen() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14b8a6"
+            colors={["#14b8a6"]}
+          />
+        }
+      >
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <TrendingUp size={20} color="#14b8a6" />

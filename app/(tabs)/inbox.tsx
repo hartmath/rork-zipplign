@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { Bell, MessageCircle } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,6 +18,7 @@ import { router } from "expo-router";
 export default function InboxScreen() {
   const insets = useSafeAreaInsets();
   const [readMessages, setReadMessages] = useState<Set<string>>(new Set());
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleHaptic = () => {
     if (Platform.OS !== 'web') {
@@ -29,6 +31,16 @@ export default function InboxScreen() {
     setReadMessages(prev => new Set([...prev, messageId]));
     router.push('/chat');
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    handleHaptic();
+    
+    setTimeout(() => {
+      console.log('Refreshed messages');
+      setRefreshing(false);
+    }, 1500);
+  }, []);
 
   const handleNotificationPress = () => {
     handleHaptic();
@@ -57,7 +69,17 @@ export default function InboxScreen() {
         </View>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#14b8a6"
+            colors={["#14b8a6"]}
+          />
+        }
+      >
         <View style={styles.section}>
           {mockMessages.map((message) => {
             const isRead = readMessages.has(message.id);

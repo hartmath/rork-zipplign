@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   Image,
   Dimensions,
   Platform,
+  RefreshControl,
 } from "react-native";
 import { Settings, Grid3x3, Heart, Bookmark, Lock, Share } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -21,6 +22,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<"videos" | "liked" | "private">("videos");
   const [isFollowing, setIsFollowing] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const handleHaptic = () => {
     if (Platform.OS !== 'web') {
@@ -48,6 +50,16 @@ export default function ProfileScreen() {
     console.log('Share profile');
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    handleHaptic();
+    
+    setTimeout(() => {
+      console.log('Refreshed profile');
+      setRefreshing(false);
+    }, 1500);
+  }, []);
+
   const handleSettingsPress = () => {
     handleHaptic();
     console.log('Open settings');
@@ -73,7 +85,18 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+      style={styles.container} 
+      showsVerticalScrollIndicator={false}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor="#14b8a6"
+          colors={["#14b8a6"]}
+        />
+      }
+    >
       <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
         <View style={styles.headerTop}>
           <View style={styles.headerLeft}>
