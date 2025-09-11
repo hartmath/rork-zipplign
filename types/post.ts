@@ -10,4 +10,12 @@ export interface Post {
   comments: string;
   shares: string;
   bookmarks: string;
+  originalPost?: {
+    id: string;
+    username: string;
+    userAvatar: string;
+    thumbnail: string;
+    description: string;
+  };
+  isRemix?: boolean;
 }

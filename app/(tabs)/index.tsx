@@ -16,7 +16,7 @@ import {
   ScrollView,
   KeyboardAvoidingView,
 } from "react-native";
-import { Heart, MessageCircle, Share2, Bookmark, Music, Bell, X, Send } from "lucide-react-native";
+import { Heart, MessageCircle, Share2, Bookmark, Music, Bell, X, Send, Zap } from "lucide-react-native";
 import { router } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -119,6 +119,11 @@ export default function HomeScreen() {
   const handleShare = () => {
     handleHaptic();
     console.log('Share functionality would be implemented here');
+  };
+
+  const handleRemix = (postId: string) => {
+    handleHaptic();
+    router.push(`/remix?postId=${postId}`);
   };
 
   const handleComment = (postId: string) => {
@@ -275,6 +280,14 @@ export default function HomeScreen() {
               <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
                 <Share2 size={28} color="#fff" strokeWidth={2} />
                 <Text style={styles.actionText}>{item.shares}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.remixButton} 
+                onPress={() => handleRemix(item.id)}
+              >
+                <Zap size={24} color="#000" strokeWidth={2} />
+                <Text style={styles.remixText}>Ride my Zip</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.musicButton} onPress={handleHaptic}>
@@ -581,5 +594,20 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     padding: 8,
+  },
+  remixButton: {
+    backgroundColor: '#14b8a6',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 8,
+  },
+  remixText: {
+    color: '#000',
+    fontSize: 12,
+    fontWeight: '600',
   },
 });
