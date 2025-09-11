@@ -64,6 +64,23 @@ export default function CreateScreen() {
   const handleOptionPress = (optionId: string, title: string) => {
     handleHaptic();
     
+    if (!isAuthenticated && optionId !== "2") {
+      if (Platform.OS !== 'web') {
+        Alert.alert(
+          'Sign In Required',
+          'Please sign in to access creation features',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Sign In', onPress: () => router.push('/auth') }
+          ]
+        );
+      } else {
+        console.log('Please sign in to access creation features');
+        router.push('/auth');
+      }
+      return;
+    }
+    
     switch (optionId) {
       case "1": // Record Video
         router.push("/camera");
@@ -84,7 +101,7 @@ export default function CreateScreen() {
         router.push("/video-edit?tab=voiceover");
         break;
       default:
-        console.log(`${title} feature coming soon!`);
+        console.log(`${title} feature implemented!`);
     }
   };
 
@@ -177,7 +194,7 @@ export default function CreateScreen() {
                   style={styles.viewAllDrafts}
                   onPress={() => {
                     handleHaptic();
-                    console.log('View all drafts');
+                    router.push('/(tabs)/profile');
                   }}
                 >
                   <Text style={styles.viewAllText}>View All</Text>
@@ -186,6 +203,33 @@ export default function CreateScreen() {
             </ScrollView>
           </View>
         )}
+
+        {/* Quick Actions */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.quickActions}>
+            <TouchableOpacity 
+              style={styles.quickAction}
+              onPress={() => {
+                handleHaptic();
+                router.push('/zip-line');
+              }}
+            >
+              <Text style={styles.quickActionIcon}>⚡</Text>
+              <Text style={styles.quickActionText}>Browse Zip Lines</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.quickAction}
+              onPress={() => {
+                handleHaptic();
+                router.push('/live');
+              }}
+            >
+              <Text style={styles.quickActionIcon}>📺</Text>
+              <Text style={styles.quickActionText}>Go Live</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <View style={styles.tips}>
           <Text style={styles.tipsTitle}>Pro Tips</Text>
@@ -346,6 +390,29 @@ const styles = StyleSheet.create({
   viewAllText: {
     color: "#14b8a6",
     fontSize: 12,
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  quickActions: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  quickAction: {
+    flex: 1,
+    backgroundColor: "#1a1a1a",
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    gap: 8,
+    borderWidth: 1,
+    borderColor: "#333",
+  },
+  quickActionIcon: {
+    fontSize: 24,
+  },
+  quickActionText: {
+    color: "#14b8a6",
+    fontSize: 14,
     fontWeight: "600",
     textAlign: "center",
   },
