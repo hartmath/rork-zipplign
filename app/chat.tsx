@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { Send, ArrowLeft } from 'lucide-react-native';
@@ -18,7 +19,15 @@ interface Message {
   text: string;
   isUser: boolean;
   timestamp: Date;
+  avatar?: string;
 }
+
+const CONTACT_INFO = {
+  name: 'Sarah Johnson',
+  avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+};
+
+const USER_AVATAR = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop&crop=face';
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState<Message[]>([
@@ -27,6 +36,7 @@ export default function ChatScreen() {
       text: 'Hello! How can I help you today?',
       isUser: false,
       timestamp: new Date(),
+      avatar: CONTACT_INFO.avatar,
     },
   ]);
   const [inputText, setInputText] = useState<string>('');
@@ -39,6 +49,7 @@ export default function ChatScreen() {
         text: inputText.trim(),
         isUser: true,
         timestamp: new Date(),
+        avatar: USER_AVATAR,
       };
 
       setMessages(prev => [...prev, newMessage]);
@@ -51,6 +62,7 @@ export default function ChatScreen() {
           text: 'Thanks for your message! This is a demo response.',
           isUser: false,
           timestamp: new Date(),
+          avatar: CONTACT_INFO.avatar,
         };
         setMessages(prev => [...prev, responseMessage]);
       }, 1000);
@@ -59,6 +71,9 @@ export default function ChatScreen() {
 
   const renderMessage = ({ item }: { item: Message }) => (
     <View style={[styles.messageContainer, item.isUser ? styles.userMessage : styles.botMessage]}>
+      {!item.isUser && (
+        <Image source={{ uri: item.avatar }} style={styles.avatar} />
+      )}
       <View style={[styles.messageBubble, item.isUser ? styles.userBubble : styles.botBubble]}>
         <Text style={[styles.messageText, item.isUser ? styles.userText : styles.botText]}>
           {item.text}
@@ -67,6 +82,9 @@ export default function ChatScreen() {
           {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </Text>
       </View>
+      {item.isUser && (
+        <Image source={{ uri: item.avatar }} style={styles.avatar} />
+      )}
     </View>
   );
 
@@ -86,7 +104,6 @@ export default function ChatScreen() {
       <Stack.Screen 
         options={{
           headerShown: true,
-          title: 'Sarah Johnson',
           headerStyle: {
             backgroundColor: '#0f172a',
           },
@@ -101,6 +118,15 @@ export default function ChatScreen() {
             >
               <ArrowLeft size={24} color="#ffffff" />
             </TouchableOpacity>
+          ),
+          headerTitle: () => (
+            <View style={styles.headerTitleContainer}>
+              <Image source={{ uri: CONTACT_INFO.avatar }} style={styles.headerAvatar} />
+              <View style={styles.headerTextContainer}>
+                <Text style={styles.headerName}>{CONTACT_INFO.name}</Text>
+                <Text style={styles.headerStatus}>Online</Text>
+              </View>
+            </View>
           ),
         }} 
       />
@@ -165,16 +191,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   messageContainer: {
+    flexDirection: 'row',
     marginVertical: 4,
-  },
-  userMessage: {
     alignItems: 'flex-end',
   },
+  userMessage: {
+    justifyContent: 'flex-end',
+  },
   botMessage: {
-    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  avatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginHorizontal: 8,
   },
   messageBubble: {
-    maxWidth: '80%',
+    maxWidth: '75%',
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 20,
@@ -249,5 +283,28 @@ const styles = StyleSheet.create({
   },
   sendButtonInactive: {
     backgroundColor: '#475569',
+  },
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerAvatar: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    marginRight: 12,
+  },
+  headerTextContainer: {
+    flex: 1,
+  },
+  headerName: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  headerStatus: {
+    color: '#0d9488',
+    fontSize: 12,
+    marginTop: 2,
   },
 });
