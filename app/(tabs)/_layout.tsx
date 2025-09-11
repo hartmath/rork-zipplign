@@ -77,15 +77,6 @@ function TabLayoutContent() {
         }}
       />
       <Tabs.Screen
-        name="zippers"
-        options={{
-          title: "Zippers",
-          tabBarIcon: ({ color, focused }) => (
-            <Users size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="create"
         options={{
           title: "Create",
