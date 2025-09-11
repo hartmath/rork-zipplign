@@ -86,9 +86,9 @@ export default function ChatScreen() {
       <Stack.Screen 
         options={{
           headerShown: true,
-          title: 'Chat',
+          title: 'Sarah Johnson',
           headerStyle: {
-            backgroundColor: '#065f46',
+            backgroundColor: '#0f172a',
           },
           headerTintColor: '#ffffff',
           headerTitleStyle: {
@@ -126,7 +126,7 @@ export default function ChatScreen() {
             value={inputText}
             onChangeText={setInputText}
             placeholder="Type a message..."
-            placeholderTextColor="#9ca3af"
+            placeholderTextColor="#94a3b8"
             multiline
             maxLength={500}
             onSubmitEditing={sendMessage}
@@ -148,7 +148,7 @@ export default function ChatScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#0f172a',
   },
   backButton: {
     padding: 8,
@@ -180,18 +180,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   userBubble: {
-    backgroundColor: '#065f46',
+    backgroundColor: '#0d9488',
     borderBottomRightRadius: 4,
   },
   botBubble: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#1e293b',
     borderBottomLeftRadius: 4,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 1,
     },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 2,
   },
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
   botText: {
-    color: '#1f2937',
+    color: '#e2e8f0',
   },
   timestamp: {
     fontSize: 12,
@@ -213,27 +213,28 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.7)',
   },
   botTimestamp: {
-    color: '#6b7280',
+    color: '#94a3b8',
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#1e293b',
     borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
+    borderTopColor: '#334155',
   },
   textInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#d1d5db',
+    borderColor: '#475569',
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
     maxHeight: 100,
-    backgroundColor: '#f9fafb',
+    backgroundColor: '#334155',
+    color: '#e2e8f0',
     marginRight: 12,
   },
   sendButton: {
@@ -244,9 +245,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sendButtonActive: {
-    backgroundColor: '#065f46',
+    backgroundColor: '#0d9488',
   },
   sendButtonInactive: {
-    backgroundColor: '#f3f4f6',
+    backgroundColor: '#475569',
   },
 });
