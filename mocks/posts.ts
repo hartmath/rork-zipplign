@@ -13,6 +13,14 @@ export const mockPosts: Post[] = [
     comments: "1.2K",
     shares: "892",
     bookmarks: "12K",
+    isRemix: true,
+    originalPost: {
+      id: "original_1",
+      username: "nature_lover",
+      userAvatar: "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150",
+      thumbnail: "https://images.unsplash.com/photo-1464822759844-d150baec93d5?w=800",
+      description: "Original mountain exploration",
+    },
   },
   {
     id: "2",
@@ -26,6 +34,14 @@ export const mockPosts: Post[] = [
     comments: "3.4K",
     shares: "567",
     bookmarks: "45K",
+    isRemix: true,
+    originalPost: {
+      id: "original_2",
+      username: "chef_marco",
+      userAvatar: "https://images.unsplash.com/photo-1566492031773-4f4e44671d66?w=150",
+      thumbnail: "https://images.unsplash.com/photo-1551183053-bf91a1d81141?w=800",
+      description: "Traditional Italian pasta recipe",
+    },
   },
   {
     id: "3",
@@ -39,6 +55,14 @@ export const mockPosts: Post[] = [
     comments: "8.9K",
     shares: "23K",
     bookmarks: "78K",
+    isRemix: true,
+    originalPost: {
+      id: "original_3",
+      username: "dance_queen",
+      userAvatar: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=150",
+      thumbnail: "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=800",
+      description: "Original dance moves tutorial",
+    },
   },
   {
     id: "4",
@@ -52,6 +76,14 @@ export const mockPosts: Post[] = [
     comments: "2.1K",
     shares: "4.5K",
     bookmarks: "34K",
+    isRemix: true,
+    originalPost: {
+      id: "original_4",
+      username: "gadget_reviewer",
+      userAvatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150",
+      thumbnail: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=800",
+      description: "Must-have tech for professionals",
+    },
   },
   {
     id: "5",
@@ -65,6 +97,14 @@ export const mockPosts: Post[] = [
     comments: "5.6K",
     shares: "12K",
     bookmarks: "89K",
+    isRemix: true,
+    originalPost: {
+      id: "original_5",
+      username: "gym_trainer",
+      userAvatar: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=150",
+      thumbnail: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800",
+      description: "Basic workout fundamentals",
+    },
   },
   {
     id: "6",
@@ -78,6 +118,14 @@ export const mockPosts: Post[] = [
     comments: "7.8K",
     shares: "15K",
     bookmarks: "123K",
+    isRemix: true,
+    originalPost: {
+      id: "original_6",
+      username: "classic_painter",
+      userAvatar: "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=150",
+      thumbnail: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800",
+      description: "Traditional painting techniques",
+    },
   },
   {
     id: "7",
