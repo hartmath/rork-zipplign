@@ -98,21 +98,43 @@ export default function SearchScreen() {
     handleSearch(search);
   };
 
+  const handleVideoPress = (videoId: string) => {
+    handleHaptic();
+    router.push(`/video/${videoId}`);
+  };
+
+  const handleUserPress = (username: string, avatar: string) => {
+    handleHaptic();
+    router.push(`/user-profile?username=${username}&avatar=${encodeURIComponent(avatar)}`);
+  };
+
   const renderUserResult = ({ item }: { item: typeof mockPosts[0] }) => (
-    <TouchableOpacity style={styles.userResult} onPress={handleHaptic}>
+    <TouchableOpacity 
+      style={styles.userResult} 
+      onPress={() => handleUserPress(item.username, item.userAvatar)}
+    >
       <Image source={{ uri: item.userAvatar }} style={styles.userAvatar} />
       <View style={styles.userInfo}>
         <Text style={styles.userName}>@{item.username}</Text>
         <Text style={styles.userFollowers}>245K followers</Text>
       </View>
-      <TouchableOpacity style={styles.followButton}>
+      <TouchableOpacity 
+        style={styles.followButton}
+        onPress={(e) => {
+          e.stopPropagation();
+          handleHaptic();
+        }}
+      >
         <Text style={styles.followButtonText}>Follow</Text>
       </TouchableOpacity>
     </TouchableOpacity>
   );
 
   const renderVideoResult = ({ item }: { item: typeof mockDiscoverVideos[0] }) => (
-    <TouchableOpacity style={styles.videoResult} onPress={handleHaptic}>
+    <TouchableOpacity 
+      style={styles.videoResult} 
+      onPress={() => handleVideoPress(item.id)}
+    >
       <Image source={{ uri: item.thumbnail }} style={styles.videoThumbnail} />
       <View style={styles.videoOverlay}>
         <Text style={styles.videoViews}>{item.views}</Text>
@@ -134,7 +156,7 @@ export default function SearchScreen() {
           <Search size={20} color="#999" />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search zipp"
+            placeholder="Search users, videos, hashtags..."
             placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={handleSearch}

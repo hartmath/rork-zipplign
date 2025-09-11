@@ -55,6 +55,9 @@ export default function VideoScreen() {
         comments: "1.2K",
         shares: "892",
         bookmarks: "5.6K",
+        hearts: discoverVideo.views,
+        zippers: "23",
+        duration: 30,
       };
     }
   }
@@ -134,6 +137,16 @@ export default function VideoScreen() {
   const handleRemix = (postId: string) => {
     handleHaptic();
     router.push(`/remix?postId=${postId}`);
+  };
+
+  const handleZipLine = (postId: string) => {
+    handleHaptic();
+    router.push(`/zip-line?postId=${postId}`);
+  };
+
+  const handleUserProfile = (username: string, avatar: string) => {
+    handleHaptic();
+    router.push(`/user-profile?username=${username}&avatar=${encodeURIComponent(avatar)}`);
   };
 
   const handleComment = (postId: string) => {
@@ -237,7 +250,10 @@ export default function VideoScreen() {
 
           <View style={[styles.content, { paddingBottom: insets.bottom + 20 }]}>
             <View style={styles.sidebar}>
-              <TouchableOpacity style={styles.profileButton} onPress={() => toggleFollow(videoData.username)}>
+              <TouchableOpacity 
+                style={styles.profileButton} 
+                onPress={() => handleUserProfile(videoData.username, videoData.userAvatar)}
+              >
                 <Image source={{ uri: videoData.userAvatar }} style={styles.avatar} />
                 {!isFollowed && (
                   <View style={styles.followButton}>
@@ -290,6 +306,18 @@ export default function VideoScreen() {
                 onPress={() => handleRemix(videoData.id)}
               >
                 <Zap size={28} color="#14b8a6" strokeWidth={2} />
+                <Text style={styles.actionText}>Remix</Text>
+              </TouchableOpacity>
+
+              {/* Zip Line Button */}
+              <TouchableOpacity 
+                style={styles.zipLineButton} 
+                onPress={() => handleZipLine(videoData.id)}
+              >
+                <View style={styles.zipLineIcon}>
+                  <Text style={styles.zipLineText}>Z</Text>
+                </View>
+                <Text style={styles.actionText}>Zip</Text>
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.musicButton} onPress={handleHaptic}>
@@ -298,16 +326,29 @@ export default function VideoScreen() {
             </View>
 
             <View style={styles.footer}>
-              <Text style={styles.username}>@{videoData.username}</Text>
+              <TouchableOpacity onPress={() => handleUserProfile(videoData.username, videoData.userAvatar)}>
+                <Text style={styles.username}>@{videoData.username}</Text>
+              </TouchableOpacity>
               <Text style={styles.description} numberOfLines={3}>
                 {videoData.description}
               </Text>
-              <View style={styles.musicInfo}>
+              <TouchableOpacity style={styles.musicInfo} onPress={handleHaptic}>
                 <Music size={14} color="#fff" />
                 <Text style={styles.musicText} numberOfLines={1}>
                   {videoData.music}
                 </Text>
-              </View>
+              </TouchableOpacity>
+              
+              {videoData.isRemix && videoData.originalPost && (
+                <TouchableOpacity 
+                  style={styles.originalPostInfo}
+                  onPress={() => handleUserProfile(videoData.originalPost!.username, videoData.originalPost!.userAvatar)}
+                >
+                  <Text style={styles.originalPostText}>
+                    Original by @{videoData.originalPost.username}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
         </View>
@@ -496,6 +537,32 @@ const styles = StyleSheet.create({
   remixButton: {
     alignItems: 'center',
     gap: 2,
+  },
+  zipLineButton: {
+    alignItems: 'center',
+    gap: 2,
+  },
+  zipLineIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#fbbf24',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  zipLineText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  originalPostInfo: {
+    marginTop: 8,
+    paddingVertical: 4,
+  },
+  originalPostText: {
+    color: '#14b8a6',
+    fontSize: 12,
+    fontWeight: '500',
   },
   modalContainer: {
     flex: 1,

@@ -11,17 +11,25 @@ import {
   Dimensions,
   ScrollView,
 } from "react-native";
-import { ArrowLeft, Play, Users, Heart, MessageCircle } from "lucide-react-native";
-import { router } from "expo-router";
+import { ArrowLeft, Play, Users, Heart, MessageCircle, Zap } from "lucide-react-native";
+import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { mockPosts } from "@/mocks/posts";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function ZipLineScreen() {
+  const { postId } = useLocalSearchParams<{ postId?: string }>();
   const [selectedVideo, setSelectedVideo] = useState(0);
+  const [isActive, setIsActive] = useState(false);
   const scrollViewRef = useRef<ScrollView>(null);
   const animatedValues = useRef(mockPosts.map(() => new Animated.Value(0))).current;
+  
+  // Find the original post if postId is provided
+  const originalPost = postId ? mockPosts.find(post => post.id === postId) : null;
+  const zipLineVideos = originalPost ? 
+    mockPosts.filter(post => post.originalPost?.id === originalPost.id || post.id === originalPost.id) :
+    mockPosts.slice(0, 8);
 
   const handleHaptic = () => {
     if (Platform.OS !== 'web') {
@@ -64,7 +72,18 @@ export default function ZipLineScreen() {
 
   const handleJoinZip = () => {
     handleHaptic();
-    router.push('/camera?zipId=demo');
+    const zipId = originalPost?.id || 'demo';
+    router.push(`/camera?zipId=${zipId}`);
+  };
+
+  const handleStartZipLine = () => {
+    handleHaptic();
+    setIsActive(true);
+  };
+
+  const handleVideoPress = (videoId: string) => {
+    handleHaptic();
+    router.push(`/video/${videoId}`);
   };
 
   const renderZipLineVideo = (post: typeof mockPosts[0], index: number) => {
@@ -101,7 +120,7 @@ export default function ZipLineScreen() {
     );
   };
 
-  const selectedPost = mockPosts[selectedVideo];
+  const selectedPost = zipLineVideos[selectedVideo] || zipLineVideos[0];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -121,14 +140,26 @@ export default function ZipLineScreen() {
       </View>
 
       <View style={styles.zipLineContainer}>
-        <Text style={styles.zipLineTitle}>The Zipping Experience</Text>
-        <Text style={styles.zipLineDescription}>
-          Watch videos move down the line towards the Zipping windows
+        <Text style={styles.zipLineTitle}>
+          {originalPost ? `Zip Line: ${originalPost.username}` : 'The Zipping Experience'}
         </Text>
+        <Text style={styles.zipLineDescription}>
+          {originalPost ? 
+            `Watch remixes of @${originalPost.username}'s video move down the zip line` :
+            'Watch videos move down the line towards the Zipping windows'
+          }
+        </Text>
+        
+        {!isActive && (
+          <TouchableOpacity style={styles.startButton} onPress={handleStartZipLine}>
+            <Zap size={20} color="#000" />
+            <Text style={styles.startButtonText}>Start Zip Line</Text>
+          </TouchableOpacity>
+        )}
         
         <View style={styles.zipLineTrack}>
           <View style={styles.zipLine} />
-          {mockPosts.slice(0, 6).map((post, index) => renderZipLineVideo(post, index))}
+          {zipLineVideos.slice(0, 6).map((post, index) => renderZipLineVideo(post, index))}
         </View>
 
         <View style={styles.windowsContainer}>
@@ -167,14 +198,14 @@ export default function ZipLineScreen() {
         style={styles.videoCarousel}
         contentContainerStyle={styles.carouselContent}
       >
-        {mockPosts.map((post, index) => (
+        {zipLineVideos.map((post, index) => (
           <TouchableOpacity
             key={post.id}
             style={[
               styles.carouselItem,
               selectedVideo === index && styles.selectedCarouselItem
             ]}
-            onPress={() => handleVideoSelect(index)}
+            onPress={() => handleVideoPress(post.id)}
           >
             <Image source={{ uri: post.thumbnail }} style={styles.carouselImage} />
             <View style={styles.carouselOverlay}>
@@ -213,7 +244,7 @@ export default function ZipLineScreen() {
             • Videos move along the line towards viewing windows{'\n'}
             • Each video shows for 15 seconds in each window{'\n'}
             • Tap the Z button to join the line with your own Zippclip{'\n'}
-            • See who's coming down the pipeline before they arrive
+            • See who&apos;s coming down the pipeline before they arrive
           </Text>
         </View>
       </View>
@@ -465,5 +496,20 @@ const styles = StyleSheet.create({
     color: "#ccc",
     fontSize: 13,
     lineHeight: 18,
+  },
+  startButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fbbf24',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 25,
+    gap: 8,
+    marginTop: 16,
+  },
+  startButtonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
