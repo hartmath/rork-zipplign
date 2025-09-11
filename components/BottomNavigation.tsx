@@ -14,8 +14,11 @@ export default function BottomNavigation() {
   }
 
   const isActive = (path: string) => {
-    if (path === '/(tabs)' && (pathname === '/' || pathname === '/(tabs)')) return true;
-    if (path !== '/(tabs)' && pathname.includes(path.replace('/(tabs)/', ''))) return true;
+    if (path === '/(tabs)' && (pathname === '/' || pathname === '/(tabs)' || pathname === '/(tabs)/')) return true;
+    if (path === '/(tabs)/discover' && pathname === '/(tabs)/discover') return true;
+    if (path === '/(tabs)/create' && pathname === '/(tabs)/create') return true;
+    if (path === '/(tabs)/inbox' && pathname === '/(tabs)/inbox') return true;
+    if (path === '/(tabs)/profile' && pathname === '/(tabs)/profile') return true;
     return false;
   };
 
@@ -53,8 +56,8 @@ export default function BottomNavigation() {
       >
         <Search 
           size={24} 
-          color={isActive('discover') ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'} 
-          strokeWidth={isActive('discover') ? 2.5 : 2} 
+          color={isActive('/(tabs)/discover') ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'} 
+          strokeWidth={isActive('/(tabs)/discover') ? 2.5 : 2} 
         />
       </TouchableOpacity>
 
@@ -76,8 +79,8 @@ export default function BottomNavigation() {
       >
         <MessageCircle 
           size={24} 
-          color={isActive('inbox') ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'} 
-          strokeWidth={isActive('inbox') ? 2.5 : 2} 
+          color={isActive('/(tabs)/inbox') ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'} 
+          strokeWidth={isActive('/(tabs)/inbox') ? 2.5 : 2} 
         />
       </TouchableOpacity>
 
@@ -87,8 +90,8 @@ export default function BottomNavigation() {
       >
         <User 
           size={24} 
-          color={isActive('profile') ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'} 
-          strokeWidth={isActive('profile') ? 2.5 : 2} 
+          color={isActive('/(tabs)/profile') ? '#ffffff' : 'rgba(255, 255, 255, 0.6)'} 
+          strokeWidth={isActive('/(tabs)/profile') ? 2.5 : 2} 
         />
       </TouchableOpacity>
     </View>
