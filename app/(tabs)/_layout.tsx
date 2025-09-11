@@ -49,7 +49,11 @@ function TabLayoutContent() {
         tabBarInactiveTintColor: "rgba(255, 255, 255, 0.6)",
         headerShown: false,
         tabBarStyle: {
-          display: 'none',
+          backgroundColor: "#000",
+          borderTopWidth: 0,
+          height: 80,
+          paddingBottom: 20,
+          paddingTop: 10,
         },
         tabBarShowLabel: false,
       }}

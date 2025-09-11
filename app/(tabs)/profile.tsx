@@ -10,16 +10,19 @@ import {
   Platform,
   RefreshControl,
 } from "react-native";
-import { Settings, Grid3x3, Heart, Bookmark, Lock, Share } from "lucide-react-native";
+import { Settings, Grid3x3, Heart, Bookmark, Lock, Share, LogIn, LogOut } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { mockUserProfile, mockUserVideos } from "@/mocks/profile";
+import { useZipplign } from "@/app/context/ZipplignProvider";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const GRID_ITEM_WIDTH = (SCREEN_WIDTH - 4) / 3;
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
+  const { currentUser, isAuthenticated, signOut, drafts } = useZipplign();
   const [activeTab, setActiveTab] = useState<"videos" | "liked" | "private">("videos");
   const [isFollowing, setIsFollowing] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -65,10 +68,62 @@ export default function ProfileScreen() {
     console.log('Open settings');
   };
 
+  const handleSignOut = () => {
+    handleHaptic();
+    signOut();
+  };
+
+  const handleSignIn = () => {
+    handleHaptic();
+    router.push('/auth');
+  };
+
+  if (!isAuthenticated || !currentUser) {
+    return (
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        <View style={[styles.header, { paddingTop: insets.top + 10 }]}>
+          <View style={styles.headerTop}>
+            <View style={styles.headerLeft}>
+              <Image 
+                source={{ uri: "https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ksbndrs7ygm0hfnsn6zmq" }}
+                style={styles.logo}
+              />
+              <Text style={styles.username}>Profile</Text>
+            </View>
+          </View>
+        </View>
+        
+        <View style={styles.unauthenticatedContainer}>
+          <Image 
+            source={{ uri: "https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ksbndrs7ygm0hfnsn6zmq" }}
+            style={styles.logoLarge}
+          />
+          <Text style={styles.unauthenticatedTitle}>Join Zipplign</Text>
+          <Text style={styles.unauthenticatedSubtitle}>
+            Create your Zipper profile and start sharing Zippclips with the world!
+          </Text>
+          
+          <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
+            <LogIn size={20} color="#fff" />
+            <Text style={styles.signInButtonText}>Sign In / Sign Up</Text>
+          </TouchableOpacity>
+          
+          <View style={styles.guestFeatures}>
+            <Text style={styles.guestFeaturesTitle}>You can still:</Text>
+            <Text style={styles.guestFeatureItem}>• Watch Zippclips without an account</Text>
+            <Text style={styles.guestFeatureItem}>• Browse trending content</Text>
+            <Text style={styles.guestFeatureItem}>• Discover new creators</Text>
+            <Text style={styles.guestFeatureItem}>• Search for specific content</Text>
+          </View>
+        </View>
+      </ScrollView>
+    );
+  }
+
   const tabs = [
-    { id: "videos" as const, icon: Grid3x3, count: mockUserProfile.videosCount },
-    { id: "liked" as const, icon: Heart, count: mockUserProfile.likesCount },
-    { id: "private" as const, icon: Lock, count: 0 },
+    { id: "videos" as const, icon: Grid3x3, count: parseInt(currentUser.zippclips) },
+    { id: "liked" as const, icon: Heart, count: 0 },
+    { id: "private" as const, icon: Lock, count: drafts.length },
   ];
 
   const getTabVideos = () => {
@@ -104,7 +159,7 @@ export default function ProfileScreen() {
               source={{ uri: "https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/ksbndrs7ygm0hfnsn6zmq" }}
               style={styles.logo}
             />
-            <Text style={styles.username}>@{mockUserProfile.username}</Text>
+            <Text style={styles.username}>@{currentUser.username}</Text>
           </View>
           <TouchableOpacity onPress={handleSettingsPress}>
             <Settings size={24} color="#fff" />
@@ -112,27 +167,34 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.profileInfo}>
-          <Image source={{ uri: mockUserProfile.avatar }} style={styles.avatar} />
+          <Image source={{ uri: currentUser.avatar }} style={styles.avatar} />
           
           <View style={styles.stats}>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{mockUserProfile.following}</Text>
+              <Text style={styles.statNumber}>{currentUser.following}</Text>
               <Text style={styles.statLabel}>Following</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{mockUserProfile.followers}</Text>
+              <Text style={styles.statNumber}>{currentUser.followers}</Text>
               <Text style={styles.statLabel}>Followers</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statNumber}>{mockUserProfile.likes}</Text>
-              <Text style={styles.statLabel}>Likes</Text>
+              <Text style={styles.statNumber}>{currentUser.zippclips}</Text>
+              <Text style={styles.statLabel}>Zippclips</Text>
             </View>
           </View>
         </View>
 
         <View style={styles.bioSection}>
-          <Text style={styles.name}>{mockUserProfile.name}</Text>
-          <Text style={styles.bio}>{mockUserProfile.bio}</Text>
+          <View style={styles.usernameContainer}>
+            <Text style={styles.name}>{currentUser.displayName}</Text>
+            {currentUser.isVerified && (
+              <View style={styles.verifiedBadge}>
+                <Text style={styles.verifiedText}>✓</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.bio}>{currentUser.bio}</Text>
         </View>
 
         <View style={styles.actions}>
@@ -141,6 +203,9 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           <TouchableOpacity style={styles.shareButton} onPress={handleShareProfile}>
             <Share size={16} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.signOutButton} onPress={handleSignOut}>
+            <LogOut size={16} color="#dc2626" />
           </TouchableOpacity>
         </View>
       </View>
@@ -361,5 +426,89 @@ const styles = StyleSheet.create({
     color: "#666",
     fontSize: 14,
     marginTop: 4,
+  },
+  unauthenticatedContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 40,
+    paddingVertical: 60,
+  },
+  logoLarge: {
+    width: 120,
+    height: 120,
+    borderRadius: 30,
+    marginBottom: 24,
+  },
+  unauthenticatedTitle: {
+    color: "#fff",
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  unauthenticatedSubtitle: {
+    color: "#999",
+    fontSize: 16,
+    textAlign: "center",
+    lineHeight: 22,
+    marginBottom: 32,
+  },
+  signInButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#14b8a6",
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
+    marginBottom: 40,
+  },
+  signInButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  signOutButton: {
+    backgroundColor: "#1a1a1a",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  guestFeatures: {
+    alignItems: "flex-start",
+    width: "100%",
+  },
+  guestFeaturesTitle: {
+    color: "#14b8a6",
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
+  guestFeatureItem: {
+    color: "#ccc",
+    fontSize: 14,
+    lineHeight: 24,
+    marginBottom: 8,
+  },
+  usernameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 4,
+  },
+  verifiedBadge: {
+    backgroundColor: "#14b8a6",
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  verifiedText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "bold",
   },
 });

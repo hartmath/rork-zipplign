@@ -5,6 +5,7 @@ import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import BottomNavigation from "@/components/BottomNavigation";
+import { ZipplignProvider } from "@/app/context/ZipplignProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,6 +23,12 @@ function RootLayoutNav() {
         <Stack.Screen name="zippers" options={{ headerShown: false }} />
         <Stack.Screen name="live" options={{ headerShown: false }} />
         <Stack.Screen name="chat" options={{ headerShown: false }} />
+        <Stack.Screen name="auth" options={{ presentation: "modal", headerShown: false }} />
+        <Stack.Screen name="video-edit" options={{ headerShown: false }} />
+        <Stack.Screen name="music-gallery" options={{ headerShown: false }} />
+        <Stack.Screen name="zip-line" options={{ headerShown: false }} />
+        <Stack.Screen name="user-profile" options={{ headerShown: false }} />
+        <Stack.Screen name="notifications" options={{ headerShown: false }} />
       </Stack>
       <BottomNavigation />
     </>
@@ -41,9 +48,11 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <GestureHandlerRootView style={styles.container}>
-        <RootLayoutNav />
-      </GestureHandlerRootView>
+      <ZipplignProvider>
+        <GestureHandlerRootView style={styles.container}>
+          <RootLayoutNav />
+        </GestureHandlerRootView>
+      </ZipplignProvider>
     </QueryClientProvider>
   );
 }

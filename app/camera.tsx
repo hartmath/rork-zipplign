@@ -14,9 +14,11 @@ import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { X, RotateCw, Zap, Music, Timer, Sparkles } from "lucide-react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
+import { useZipplign } from '@/app/context/ZipplignProvider';
 
 export default function CameraScreen() {
   const { zipId } = useLocalSearchParams();
+  const { saveDraft, publishPost, posts, currentUser, isAuthenticated } = useZipplign();
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [isRecording, setIsRecording] = useState(false);
@@ -86,12 +88,7 @@ export default function CameraScreen() {
         const maxTime = isZipMode ? 180 : 60; // 3 minutes for zip mode, 1 minute for regular
         if (prev >= maxTime) {
           clearInterval(interval);
-          setIsRecording(false);
-          if (Platform.OS !== 'web') {
-            Alert.alert('Recording Complete', `Maximum recording time reached! ${isZipMode ? 'Your Zippclip' : 'Your video'} has been saved.`);
-          } else {
-            console.log('Recording complete - maximum time reached!');
-          }
+          stopRecording();
           return 0;
         }
         return prev + 1;
@@ -99,16 +96,74 @@ export default function CameraScreen() {
     }, 1000);
   };
 
+  const stopRecording = () => {
+    setIsRecording(false);
+    setTimer(0);
+    
+    // Create post object
+    const originalPost = isZipMode ? posts.find(p => p.id === zipId) : undefined;
+    
+    const newPost = {
+      id: `post_${Date.now()}`,
+      username: currentUser?.username || 'anonymous',
+      userAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      thumbnail: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000)}?w=800`,
+      description: isZipMode ? `Riding the zip! 🔥 #ZipLine` : 'New Zippclip! ✨',
+      music: 'Original Sound',
+      musicCover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150',
+      likes: '0',
+      comments: '0',
+      shares: '0',
+      bookmarks: '0',
+      hearts: '0',
+      zippers: '0',
+      duration: timer,
+      isRemix: isZipMode,
+      originalPost: originalPost ? {
+        id: originalPost.id,
+        username: originalPost.username,
+        userAvatar: originalPost.userAvatar,
+        thumbnail: originalPost.thumbnail,
+        description: originalPost.description,
+      } : undefined,
+    };
+    
+    // Navigate to video edit screen
+    router.push('/video-edit');
+    
+    if (Platform.OS !== 'web') {
+      Alert.alert(
+        'Recording Complete', 
+        `Your ${isZipMode ? 'Zippclip' : 'video'} is ready for editing!`,
+        [{ text: 'OK' }]
+      );
+    } else {
+      console.log(`Recording complete - ${isZipMode ? 'Zippclip' : 'video'} ready for editing!`);
+    }
+  };
+
   const handleRecord = async () => {
     handleHaptic();
-    if (isRecording) {
-      setIsRecording(false);
-      setTimer(0);
+    
+    if (!isAuthenticated) {
       if (Platform.OS !== 'web') {
-        Alert.alert('Recording Stopped', `Your ${isZipMode ? 'Zippclip' : 'video'} has been saved!`);
+        Alert.alert(
+          'Sign In Required',
+          'Please sign in to create Zippclips',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Sign In', onPress: () => router.push('/auth') }
+          ]
+        );
       } else {
-        console.log('Recording stopped - video saved!');
+        console.log('Please sign in to create Zippclips');
+        router.push('/auth');
       }
+      return;
+    }
+    
+    if (isRecording) {
+      stopRecording();
     } else {
       startCountdown();
     }
