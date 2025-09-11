@@ -8,7 +8,7 @@ import {
   Image,
   Platform,
 } from "react-native";
-import { Bell } from "lucide-react-native";
+import { Bell, MessageCircle } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { mockMessages } from "@/mocks/inbox";
@@ -27,6 +27,7 @@ export default function InboxScreen() {
   const handleMessagePress = (messageId: string) => {
     handleHaptic();
     setReadMessages(prev => new Set([...prev, messageId]));
+    router.push('/chat');
   };
 
   const handleNotificationPress = () => {
@@ -46,9 +47,14 @@ export default function InboxScreen() {
           />
           <Text style={styles.title}>Messages</Text>
         </View>
-        <TouchableOpacity onPress={handleNotificationPress}>
-          <Bell size={24} color="#fff" />
-        </TouchableOpacity>
+        <View style={styles.headerRight}>
+          <TouchableOpacity onPress={() => { handleHaptic(); router.push('/chat'); }} style={styles.chatButton}>
+            <MessageCircle size={24} color="#fff" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleNotificationPress}>
+            <Bell size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
@@ -162,6 +168,14 @@ const styles = StyleSheet.create({
 
   unreadText: {
     fontWeight: "600",
+  },
+  headerRight: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  chatButton: {
+    padding: 4,
   },
 
 });

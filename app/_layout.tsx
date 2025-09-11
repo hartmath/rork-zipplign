@@ -21,6 +21,7 @@ function RootLayoutNav() {
         <Stack.Screen name="store" options={{ headerShown: false }} />
         <Stack.Screen name="zippers" options={{ headerShown: false }} />
         <Stack.Screen name="live" options={{ headerShown: false }} />
+        <Stack.Screen name="chat" options={{ headerShown: false }} />
       </Stack>
       <BottomNavigation />
     </>
