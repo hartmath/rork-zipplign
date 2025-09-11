@@ -1,0 +1,77 @@
+export const mockMessages = [
+  {
+    id: "1",
+    name: "Sarah Johnson",
+    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150",
+    lastMessage: "That video was amazing! 🔥",
+    time: "2m",
+    unread: true,
+  },
+  {
+    id: "2",
+    name: "Mike Chen",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150",
+    lastMessage: "Let's collab on the next one",
+    time: "1h",
+    unread: true,
+  },
+  {
+    id: "3",
+    name: "Emma Wilson",
+    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150",
+    lastMessage: "Thanks for the follow back!",
+    time: "3h",
+    unread: false,
+  },
+  {
+    id: "4",
+    name: "Alex Turner",
+    avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150",
+    lastMessage: "Check out my new post",
+    time: "5h",
+    unread: false,
+  },
+];
+
+export const mockNotifications = [
+  {
+    id: "1",
+    type: "like",
+    user: "dancer_sarah",
+    action: "liked your video",
+    time: "5m ago",
+    thumbnail: "https://images.unsplash.com/photo-1518611012118-696072aa579a?w=150",
+  },
+  {
+    id: "2",
+    type: "comment",
+    user: "foodie_mike",
+    action: "commented: Amazing content! Keep it up 👏",
+    time: "15m ago",
+    thumbnail: "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=150",
+  },
+  {
+    id: "3",
+    type: "follow",
+    user: "tech_guru",
+    action: "started following you",
+    time: "1h ago",
+    thumbnail: null,
+  },
+  {
+    id: "4",
+    type: "mention",
+    user: "artist_emma",
+    action: "mentioned you in a comment",
+    time: "2h ago",
+    thumbnail: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=150",
+  },
+  {
+    id: "5",
+    type: "like",
+    user: "traveler_jane",
+    action: "and 234 others liked your video",
+    time: "3h ago",
+    thumbnail: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=150",
+  },
+];
