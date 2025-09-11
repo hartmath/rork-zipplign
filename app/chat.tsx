@@ -10,9 +10,10 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  Animated,
 } from 'react-native';
 import { Stack, router } from 'expo-router';
-import { Send, ArrowLeft, Phone, Video, MoreVertical, Smile, Camera, Mic } from 'lucide-react-native';
+import { Send, ArrowLeft, Phone, Video, MoreVertical, Smile, Camera, Mic, Heart, Plus } from 'lucide-react-native';
 
 interface Message {
   id: string;
@@ -102,23 +103,38 @@ export default function ChatScreen() {
       item.timestamp.getTime() - prevMessage.timestamp.getTime() > 300000);
     const isConsecutive = prevMessage && prevMessage.isUser === item.isUser && 
       item.timestamp.getTime() - prevMessage.timestamp.getTime() < 60000;
+    const showTime = !isConsecutive || index === messages.length - 1;
 
     return (
-      <View style={[styles.messageContainer, item.isUser ? styles.userMessage : styles.botMessage]}>
-        {!item.isUser && (
-          <View style={styles.avatarContainer}>
-            {showAvatar ? (
-              <Image source={{ uri: item.avatar }} style={styles.avatar} />
-            ) : (
-              <View style={styles.avatarSpacer} />
-            )}
+      <View style={styles.messageWrapper}>
+        <View style={[styles.messageContainer, item.isUser ? styles.userMessage : styles.botMessage]}>
+          {!item.isUser && (
+            <View style={styles.avatarContainer}>
+              {showAvatar ? (
+                <TouchableOpacity>
+                  <Image source={{ uri: item.avatar }} style={styles.avatar} />
+                </TouchableOpacity>
+              ) : (
+                <View style={styles.avatarSpacer} />
+              )}
+            </View>
+          )}
+          <View style={[styles.messageBubble, item.isUser ? styles.userBubble : styles.botBubble, isConsecutive && styles.consecutiveMessage]}>
+            <Text style={[styles.messageText, item.isUser ? styles.userText : styles.botText]}>
+              {item.text}
+            </Text>
           </View>
-        )}
-        <View style={[styles.messageBubble, item.isUser ? styles.userBubble : styles.botBubble, isConsecutive && styles.consecutiveMessage]}>
-          <Text style={[styles.messageText, item.isUser ? styles.userText : styles.botText]}>
-            {item.text}
-          </Text>
+          {item.isUser && (
+            <TouchableOpacity style={styles.messageActions}>
+              <Heart size={16} color="#666" />
+            </TouchableOpacity>
+          )}
         </View>
+        {showTime && (
+          <Text style={[styles.timestamp, item.isUser ? styles.userTimestamp : styles.botTimestamp]}>
+            {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </Text>
+        )}
       </View>
     );
   };
@@ -222,35 +238,40 @@ export default function ChatScreen() {
         
         <View style={styles.inputContainer}>
           <View style={styles.inputRow}>
-            <TouchableOpacity style={styles.inputButton}>
-              <Camera size={24} color="#666" />
+            <TouchableOpacity style={styles.mediaButton}>
+              <Plus size={22} color="#14b8a6" />
             </TouchableOpacity>
             <View style={styles.textInputContainer}>
               <TextInput
                 style={styles.textInput}
                 value={inputText}
                 onChangeText={setInputText}
-                placeholder="Message..."
+                placeholder="Send a message..."
                 placeholderTextColor="#666"
                 multiline
                 maxLength={500}
                 onSubmitEditing={sendMessage}
                 blurOnSubmit={false}
               />
-              <TouchableOpacity style={styles.emojiButton}>
-                <Smile size={20} color="#666" />
-              </TouchableOpacity>
+              <View style={styles.inputActions}>
+                <TouchableOpacity style={styles.inputActionButton}>
+                  <Camera size={20} color="#666" />
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.inputActionButton}>
+                  <Smile size={20} color="#666" />
+                </TouchableOpacity>
+              </View>
             </View>
             {inputText.trim() ? (
               <TouchableOpacity 
                 style={styles.sendButton}
                 onPress={sendMessage}
               >
-                <Send size={20} color="#ffffff" />
+                <Send size={18} color="#ffffff" />
               </TouchableOpacity>
             ) : (
-              <TouchableOpacity style={styles.inputButton}>
-                <Mic size={24} color="#666" />
+              <TouchableOpacity style={styles.micButton}>
+                <Mic size={22} color="#14b8a6" />
               </TouchableOpacity>
             )}
           </View>
@@ -276,12 +297,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   messagesContent: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 20,
+  },
+  messageWrapper: {
+    marginVertical: 4,
   },
   messageContainer: {
     flexDirection: 'row',
-    marginVertical: 2,
     alignItems: 'flex-end',
   },
   userMessage: {
@@ -291,42 +314,55 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   avatarContainer: {
-    width: 40,
+    width: 44,
     alignItems: 'center',
   },
   avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
+    borderColor: '#14b8a6',
   },
   avatarSpacer: {
-    width: 32,
-    height: 32,
+    width: 36,
+    height: 36,
   },
   messageBubble: {
-    maxWidth: '75%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 20,
+    maxWidth: '70%',
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderRadius: 24,
     marginHorizontal: 8,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   consecutiveMessage: {
     marginTop: 2,
   },
   userBubble: {
     backgroundColor: '#14b8a6',
-    borderBottomRightRadius: 6,
+    borderBottomRightRadius: 8,
   },
   botBubble: {
-    backgroundColor: '#1a1a1a',
-    borderBottomLeftRadius: 6,
+    backgroundColor: '#1f1f1f',
+    borderBottomLeftRadius: 8,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
   },
   typingBubble: {
-    paddingVertical: 16,
+    paddingVertical: 18,
   },
   messageText: {
     fontSize: 16,
-    lineHeight: 20,
+    lineHeight: 22,
+    fontWeight: '400',
   },
   userText: {
     color: '#ffffff',
@@ -334,62 +370,109 @@ const styles = StyleSheet.create({
   botText: {
     color: '#ffffff',
   },
+  messageActions: {
+    paddingLeft: 8,
+    paddingBottom: 4,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+    paddingHorizontal: 8,
+  },
+  userTimestamp: {
+    textAlign: 'right',
+    marginRight: 52,
+  },
+  botTimestamp: {
+    textAlign: 'left',
+    marginLeft: 52,
+  },
   typingIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 6,
   },
   typingDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#666',
+    backgroundColor: '#14b8a6',
   },
   inputContainer: {
-    backgroundColor: '#000',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    backgroundColor: '#0a0a0a',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     borderTopWidth: 1,
-    borderTopColor: '#1a1a1a',
+    borderTopColor: '#1f1f1f',
   },
   inputRow: {
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: 12,
   },
-  inputButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  mediaButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#1f1f1f',
+    borderWidth: 1,
+    borderColor: '#14b8a6',
+  },
+  micButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1f1f1f',
+    borderWidth: 1,
+    borderColor: '#14b8a6',
   },
   textInputContainer: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'flex-end',
-    backgroundColor: '#1a1a1a',
-    borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    backgroundColor: '#1f1f1f',
+    borderRadius: 24,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
   },
   textInput: {
     flex: 1,
     fontSize: 16,
-    maxHeight: 100,
+    maxHeight: 120,
     color: '#ffffff',
     paddingVertical: 8,
+    lineHeight: 20,
   },
-  emojiButton: {
-    padding: 8,
+  inputActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  inputActionButton: {
+    padding: 6,
   },
   sendButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#14b8a6',
+    shadowColor: '#14b8a6',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   headerTitleContainer: {
     flexDirection: 'row',
@@ -397,23 +480,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     marginRight: 12,
+    borderWidth: 2,
+    borderColor: '#14b8a6',
   },
   headerTextContainer: {
     flex: 1,
   },
   headerName: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 'bold',
   },
   headerUsername: {
-    color: '#666',
+    color: '#14b8a6',
     fontSize: 14,
-    marginTop: 2,
+    marginTop: 1,
   },
   statusContainer: {
     flexDirection: 'row',
@@ -421,9 +506,9 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   statusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: '#666',
     marginRight: 6,
   },
@@ -431,15 +516,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#14b8a6',
   },
   headerStatus: {
-    color: '#666',
+    color: '#999',
     fontSize: 12,
   },
   headerActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: 20,
   },
   headerButton: {
     padding: 8,
+    borderRadius: 20,
+    backgroundColor: 'rgba(20, 184, 166, 0.1)',
   },
 });
