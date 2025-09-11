@@ -38,7 +38,7 @@ export default function DiscoverScreen() {
 
   const handleVideoPress = (videoId: string) => {
     handleHaptic();
-    console.log('Open video:', videoId);
+    router.push(`/video/${videoId}`);
   };
 
   const handleSearchPress = () => {
