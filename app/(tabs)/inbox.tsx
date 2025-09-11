@@ -47,7 +47,8 @@ export default function InboxScreen() {
 
   const handleNewMessage = () => {
     handleHaptic();
-    console.log('New message pressed');
+    // Navigate to a new message screen or show user picker
+    console.log('New message functionality - would show user picker to start new conversation');
   };
 
   const filteredMessages = mockMessages.filter(message => {

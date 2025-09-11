@@ -132,11 +132,17 @@ export default function MusicGalleryScreen() {
       </ScrollView>
 
       <View style={styles.actionsContainer}>
-        <TouchableOpacity style={styles.actionButton} onPress={handleHaptic}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => {
+          handleHaptic();
+          console.log('Upload song functionality - would open file picker');
+        }}>
           <Upload size={24} color="#14b8a6" />
           <Text style={styles.actionText}>Upload Song</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.actionButton} onPress={handleHaptic}>
+        <TouchableOpacity style={styles.actionButton} onPress={() => {
+          handleHaptic();
+          console.log('Record original functionality - would start audio recording');
+        }}>
           <Mic size={24} color="#14b8a6" />
           <Text style={styles.actionText}>Record Original</Text>
         </TouchableOpacity>

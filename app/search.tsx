@@ -12,7 +12,7 @@ import {
   Platform,
 } from "react-native";
 import { ArrowLeft, Search, X, TrendingUp, Clock } from "lucide-react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { mockPosts } from "@/mocks/posts";
 import { mockDiscoverVideos } from "@/mocks/discover";
@@ -24,7 +24,8 @@ type SearchResults = {
 };
 
 export default function SearchScreen() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const { query } = useLocalSearchParams();
+  const [searchQuery, setSearchQuery] = useState(typeof query === 'string' ? query : "");
   const [recentSearches, setRecentSearches] = useState([
     "dance challenge",
     "cooking tips",

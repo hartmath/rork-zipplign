@@ -106,9 +106,13 @@ export default function HomeScreen() {
     contextToggleFollow(username);
   };
 
-  const handleShare = () => {
+  const handleShare = (postId: string) => {
     handleHaptic();
-    console.log('Share functionality would be implemented here');
+    const post = posts.find(p => p.id === postId);
+    if (post) {
+      console.log(`Sharing Zippclip by @${post.username}: ${post.description}`);
+      // In a real app, this would open the native share sheet
+    }
   };
 
   const handleZipJoin = (postId: string) => {
@@ -314,7 +318,7 @@ export default function HomeScreen() {
                 <Text style={styles.actionText}>{item.bookmarks}</Text>
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
+              <TouchableOpacity style={styles.actionButton} onPress={() => handleShare(item.id)}>
                 <Share2 size={28} color="#fff" strokeWidth={2} />
                 <Text style={styles.actionText}>{item.shares}</Text>
               </TouchableOpacity>

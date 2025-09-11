@@ -24,9 +24,13 @@ import {
   Share2,
   RotateCcw,
   Volume2,
-  VolumeX
+  VolumeX,
+  Mic,
+  Film,
+  Layers,
+  Zap
 } from "lucide-react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useZipplign } from '@/app/context/ZipplignProvider';
 import type { Post } from '@/types/post';

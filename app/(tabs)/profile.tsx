@@ -65,7 +65,8 @@ export default function ProfileScreen() {
 
   const handleSettingsPress = () => {
     handleHaptic();
-    console.log('Open settings');
+    // Navigate to a settings screen or show settings modal
+    console.log('Settings functionality - would show account settings, privacy, notifications, etc.');
   };
 
   const handleSignOut = () => {

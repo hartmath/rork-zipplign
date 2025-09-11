@@ -75,25 +75,13 @@ export default function CreateScreen() {
         router.push("/music-gallery");
         break;
       case "4": // Effects
-        if (Platform.OS !== 'web') {
-          Alert.alert('Effects', 'Effects panel coming soon!');
-        } else {
-          console.log('Effects panel coming soon!');
-        }
+        router.push("/video-edit?tab=effects");
         break;
       case "5": // Templates
-        if (Platform.OS !== 'web') {
-          Alert.alert('Templates', 'Video templates coming soon!');
-        } else {
-          console.log('Video templates coming soon!');
-        }
+        router.push("/video-edit?tab=templates");
         break;
       case "6": // Voiceover
-        if (Platform.OS !== 'web') {
-          Alert.alert('Voiceover', 'Voiceover recording coming soon!');
-        } else {
-          console.log('Voiceover recording coming soon!');
-        }
+        router.push("/video-edit?tab=voiceover");
         break;
       default:
         console.log(`${title} feature coming soon!`);

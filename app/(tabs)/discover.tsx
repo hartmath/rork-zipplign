@@ -35,7 +35,8 @@ export default function DiscoverScreen() {
 
   const handleTrendPress = (trendId: string) => {
     handleHaptic();
-    console.log('Open trend:', trendId);
+    // Navigate to search with the trend tag
+    router.push(`/search?query=${encodeURIComponent(mockTrends.find(t => t.id === trendId)?.tag || '')}`);
   };
 
   const handleVideoPress = (videoId: string) => {
