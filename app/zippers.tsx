@@ -17,7 +17,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { Heart, MessageCircle, Share2, Bookmark, Music, Bell, X, Send } from 'lucide-react-native';
+import { Heart, MessageCircle, Share2, Bookmark, Music, Bell, X, Send, Zap } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
@@ -38,6 +38,14 @@ interface ZipperPost {
   isFollowing: boolean;
   music: string;
   musicCover: string;
+  originalPost?: {
+    id: string;
+    username: string;
+    userAvatar: string;
+    thumbnail: string;
+    description: string;
+  };
+  isRemix?: boolean;
 }
 
 const mockZipperPosts: ZipperPost[] = [
@@ -54,6 +62,14 @@ const mockZipperPosts: ZipperPost[] = [
     isFollowing: true,
     music: 'Creative Vibes - Lo-fi Beats',
     musicCover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100',
+    isRemix: true,
+    originalPost: {
+      id: 'orig1',
+      username: 'artmaster_pro',
+      userAvatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      thumbnail: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400',
+      description: 'Original digital art tutorial'
+    },
   },
   {
     id: '2',
@@ -68,6 +84,14 @@ const mockZipperPosts: ZipperPost[] = [
     isFollowing: true,
     music: 'Focus Flow - Ambient Sounds',
     musicCover: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100',
+    isRemix: true,
+    originalPost: {
+      id: 'orig2',
+      username: 'logo_genius',
+      userAvatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150',
+      thumbnail: 'https://images.unsplash.com/photo-1626785774573-4b799315345d?w=400',
+      description: 'Logo design basics'
+    },
   },
   {
     id: '3',
@@ -82,6 +106,14 @@ const mockZipperPosts: ZipperPost[] = [
     isFollowing: false,
     music: 'Sunset Dreams - Chill Hop',
     musicCover: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=100',
+    isRemix: true,
+    originalPost: {
+      id: 'orig3',
+      username: 'sunset_photographer',
+      userAvatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150',
+      thumbnail: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
+      description: 'Perfect sunset shot'
+    },
   },
   {
     id: '4',
@@ -96,6 +128,14 @@ const mockZipperPosts: ZipperPost[] = [
     isFollowing: true,
     music: 'Studio Sessions - Hip Hop Beat',
     musicCover: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=100',
+    isRemix: true,
+    originalPost: {
+      id: 'orig4',
+      username: 'beat_producer',
+      userAvatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150',
+      thumbnail: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400',
+      description: 'Original beat template'
+    },
   },
   {
     id: '5',
@@ -110,6 +150,14 @@ const mockZipperPosts: ZipperPost[] = [
     isFollowing: false,
     music: 'Winter Vibes - Indie Pop',
     musicCover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=100',
+    isRemix: true,
+    originalPost: {
+      id: 'orig5',
+      username: 'winter_style_guru',
+      userAvatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      thumbnail: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400',
+      description: 'Winter fashion essentials'
+    },
   },
 ];
 
@@ -210,6 +258,11 @@ export default function ZippersScreen() {
     console.log('Share functionality would be implemented here');
   };
 
+  const handleRemix = (postId: string) => {
+    handleHaptic();
+    router.push('/remix');
+  };
+
   const handleComment = (postId: string) => {
     handleHaptic();
     setSelectedPostId(postId);
@@ -294,6 +347,17 @@ export default function ZippersScreen() {
         />
 
         <View style={[styles.overlay, { paddingTop: insets.top }]}>
+          {/* PIP for remix videos */}
+          {item.isRemix && item.originalPost && (
+            <View style={styles.pipContainer}>
+              <Image source={{ uri: item.originalPost.thumbnail }} style={styles.pipVideo} />
+              <View style={styles.pipOverlay}>
+                <Image source={{ uri: item.originalPost.userAvatar }} style={styles.pipAvatar} />
+                <Text style={styles.pipUsername} numberOfLines={1}>@{item.originalPost.username}</Text>
+              </View>
+            </View>
+          )}
+
           <View style={styles.header}>
             <View style={styles.headerNavigation}>
               <TouchableOpacity style={styles.navItem} onPress={() => handleNavPress('Events')}>
@@ -364,6 +428,13 @@ export default function ZippersScreen() {
               <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
                 <Share2 size={28} color="#fff" strokeWidth={2} />
                 <Text style={styles.actionText}>{item.shares}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.remixButton} 
+                onPress={() => handleRemix(item.id)}
+              >
+                <Zap size={28} color="#14b8a6" strokeWidth={2} />
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.musicButton} onPress={handleHaptic}>
@@ -675,5 +746,49 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     padding: 8,
+  },
+  remixButton: {
+    alignItems: 'center',
+    gap: 2,
+  },
+  pipContainer: {
+    position: 'absolute',
+    top: 80,
+    left: 20,
+    width: 120,
+    height: 160,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#14b8a6',
+    zIndex: 10,
+  },
+  pipVideo: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  pipOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  pipAvatar: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+  },
+  pipUsername: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '600',
+    flex: 1,
   },
 });
