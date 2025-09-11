@@ -4,7 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect } from "react";
 import { StyleSheet } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import BottomNavigation from "@/components/BottomNavigation";
+
 import { ZipplignProvider } from "@/app/context/ZipplignProvider";
 
 SplashScreen.preventAutoHideAsync();
@@ -30,7 +30,7 @@ function RootLayoutNav() {
         <Stack.Screen name="user-profile" options={{ headerShown: false }} />
         <Stack.Screen name="notifications" options={{ headerShown: false }} />
       </Stack>
-      <BottomNavigation />
+
     </>
   );
 }
