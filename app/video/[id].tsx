@@ -217,6 +217,17 @@ export default function VideoScreen() {
         />
 
         <View style={[styles.overlay, { paddingTop: insets.top }]}>
+          {/* PIP for remix videos */}
+          {videoData.isRemix && videoData.originalPost && (
+            <View style={styles.pipContainer}>
+              <Image source={{ uri: videoData.originalPost.thumbnail }} style={styles.pipVideo} />
+              <View style={styles.pipOverlay}>
+                <Image source={{ uri: videoData.originalPost.userAvatar }} style={styles.pipAvatar} />
+                <Text style={styles.pipUsername} numberOfLines={1}>@{videoData.originalPost.username}</Text>
+              </View>
+            </View>
+          )}
+
           {/* Header with back button */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.backButtonHeader} onPress={handleBack}>
@@ -575,5 +586,45 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  pipContainer: {
+    position: 'absolute',
+    top: 80,
+    left: 20,
+    width: 120,
+    height: 160,
+    borderRadius: 12,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: '#14b8a6',
+    zIndex: 10,
+  },
+  pipVideo: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  pipOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  pipAvatar: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+  },
+  pipUsername: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '600',
+    flex: 1,
   },
 });
