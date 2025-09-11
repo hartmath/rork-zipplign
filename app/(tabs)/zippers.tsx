@@ -25,15 +25,25 @@ import * as Haptics from "expo-haptics";
 import { mockPosts } from "@/mocks/posts";
 import type { Post } from "@/types/post";
 import { useRefresh } from "./_layout";
+import { useZipplign } from "@/app/context/ZipplignProvider";
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function ZippersScreen() {
   const insets = useSafeAreaInsets();
   const { setRefreshTrigger } = useRefresh();
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
-  const [bookmarkedPosts, setBookmarkedPosts] = useState<Set<string>>(new Set());
-  const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
+  const { 
+    posts, 
+    likedPosts, 
+    bookmarkedPosts, 
+    followedUsers, 
+    toggleLike: contextToggleLike, 
+    toggleBookmark: contextToggleBookmark, 
+    toggleFollow: contextToggleFollow,
+    joinZipLine,
+    currentUser,
+    isAuthenticated
+  } = useZipplign();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -83,41 +93,17 @@ export default function ZippersScreen() {
       }),
     ]).start();
 
-    setLikedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-      }
-      return newSet;
-    });
+    contextToggleLike(postId);
   };
 
   const toggleBookmark = (postId: string) => {
     handleHaptic();
-    setBookmarkedPosts(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(postId)) {
-        newSet.delete(postId);
-      } else {
-        newSet.add(postId);
-      }
-      return newSet;
-    });
+    contextToggleBookmark(postId);
   };
 
   const toggleFollow = (username: string) => {
     handleHaptic();
-    setFollowedUsers(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(username)) {
-        newSet.delete(username);
-      } else {
-        newSet.add(username);
-      }
-      return newSet;
-    });
+    contextToggleFollow(username);
   };
 
   const handleShare = () => {
@@ -127,6 +113,11 @@ export default function ZippersScreen() {
 
   const handleZipJoin = (postId: string) => {
     handleHaptic();
+    if (!isAuthenticated) {
+      console.log('Please sign in to join Zip Lines');
+      return;
+    }
+    joinZipLine(postId);
     router.push(`/camera?zipId=${postId}`);
   };
 
@@ -365,7 +356,7 @@ export default function ZippersScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <FlatList
-        data={mockPosts}
+        data={posts}
         renderItem={renderPost}
         keyExtractor={(item) => item.id}
         pagingEnabled
