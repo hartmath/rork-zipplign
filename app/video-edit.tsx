@@ -8,6 +8,8 @@ import {
   SafeAreaView,
   Image,
   Platform,
+  TextInput,
+  Alert,
 } from "react-native";
 import { 
   ArrowLeft, 
@@ -26,14 +28,20 @@ import {
 } from "lucide-react-native";
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
+import { useZipplign } from '@/app/context/ZipplignProvider';
+import type { Post } from '@/types/post';
 
 export default function VideoEditScreen() {
+  const { publishPost, saveDraft, currentUser } = useZipplign();
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration] = useState(45); // 45 seconds
   const [selectedFilter, setSelectedFilter] = useState("None");
   const [volume, setVolume] = useState(0.8);
   const [isMuted, setIsMuted] = useState(false);
+  const [description, setDescription] = useState('');
+  const [selectedMusic, setSelectedMusic] = useState('Somewhere Only We Know - Keane');
+  const [isPGN, setIsPGN] = useState(false);
 
   const filters = [
     { id: "none", name: "None", preview: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=100" },
@@ -62,10 +70,62 @@ export default function VideoEditScreen() {
     setIsPlaying(!isPlaying);
   };
 
-  const handleSave = () => {
+  const handleSaveDraft = () => {
     handleHaptic();
-    console.log('Saving Zippclip...');
-    router.push('/');
+    
+    const draftPost: Partial<Post> = {
+      description: description.trim() || 'New Zippclip! ✨',
+      music: selectedMusic,
+      isPGN,
+      duration,
+      thumbnail: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000)}?w=800`,
+    };
+
+    saveDraft(draftPost);
+    
+    if (Platform.OS !== 'web') {
+      Alert.alert('Draft Saved', 'Your Zippclip has been saved as a draft.', [
+        { text: 'OK', onPress: () => router.back() }
+      ]);
+    } else {
+      console.log('Draft saved successfully!');
+      router.back();
+    }
+  };
+
+  const handlePublish = () => {
+    handleHaptic();
+    
+    const newPost: Post = {
+      id: `post_${Date.now()}`,
+      username: currentUser?.username || 'anonymous',
+      userAvatar: currentUser?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      thumbnail: `https://images.unsplash.com/photo-${Math.floor(Math.random() * 1000000000)}?w=800`,
+      description: description.trim() || 'New Zippclip! ✨',
+      music: selectedMusic,
+      musicCover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=150',
+      likes: '0',
+      comments: '0',
+      shares: '0',
+      bookmarks: '0',
+      hearts: '0',
+      zippers: '0',
+      duration,
+      isPGN,
+    };
+
+    publishPost(newPost);
+    
+    if (Platform.OS !== 'web') {
+      Alert.alert(
+        'Zippclip Published!', 
+        'Your Zippclip is now live on Zipplign!',
+        [{ text: 'OK', onPress: () => router.push('/') }]
+      );
+    } else {
+      console.log('Zippclip published successfully!');
+      router.push('/');
+    }
   };
 
   const handleShare = () => {
@@ -89,7 +149,7 @@ export default function VideoEditScreen() {
           <ArrowLeft size={24} color="#fff" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit Zippclip</Text>
-        <TouchableOpacity onPress={handleSave}>
+        <TouchableOpacity onPress={handleSaveDraft}>
           <Save size={24} color="#14b8a6" />
         </TouchableOpacity>
       </View>
@@ -117,6 +177,24 @@ export default function VideoEditScreen() {
       </View>
 
       <ScrollView style={styles.editingPanel} showsVerticalScrollIndicator={false}>
+        {/* Description Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Type size={20} color="#14b8a6" />
+            <Text style={styles.sectionTitle}>Description</Text>
+          </View>
+          <TextInput
+            style={styles.descriptionInput}
+            placeholder="Describe your Zippclip..."
+            placeholderTextColor="#666"
+            value={description}
+            onChangeText={setDescription}
+            multiline
+            maxLength={500}
+          />
+          <Text style={styles.characterCount}>{description.length}/500</Text>
+        </View>
+
         {/* Music Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -132,8 +210,8 @@ export default function VideoEditScreen() {
               style={styles.musicCover}
             />
             <View style={styles.musicInfo}>
-              <Text style={styles.musicTitle}>Somewhere Only We Know</Text>
-              <Text style={styles.musicArtist}>Keane</Text>
+              <Text style={styles.musicTitle}>{selectedMusic}</Text>
+              <Text style={styles.musicArtist}>Tap to change</Text>
             </View>
             <View style={styles.volumeControls}>
               <TouchableOpacity onPress={() => {
@@ -226,6 +304,25 @@ export default function VideoEditScreen() {
             </TouchableOpacity>
           </View>
         </View>
+
+        {/* PGN Toggle */}
+        <View style={styles.section}>
+          <View style={styles.pgnContainer}>
+            <View>
+              <Text style={styles.sectionTitle}>Parental Guidance Needed (PGN)</Text>
+              <Text style={styles.sectionSubtitle}>Mark if content needs parental guidance</Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.toggle, isPGN && styles.toggleActive]}
+              onPress={() => {
+                handleHaptic();
+                setIsPGN(!isPGN);
+              }}
+            >
+              <View style={[styles.toggleThumb, isPGN && styles.toggleThumbActive]} />
+            </TouchableOpacity>
+          </View>
+        </View>
       </ScrollView>
 
       <View style={styles.bottomActions}>
@@ -233,8 +330,8 @@ export default function VideoEditScreen() {
           <RotateCcw size={20} color="#666" />
           <Text style={styles.actionButtonText}>Reset</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.primaryButton} onPress={handleSave}>
-          <Text style={styles.primaryButtonText}>Save Zippclip</Text>
+        <TouchableOpacity style={styles.primaryButton} onPress={handlePublish}>
+          <Text style={styles.primaryButtonText}>Publish Zippclip</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton} onPress={handleShare}>
           <Share2 size={20} color="#14b8a6" />
@@ -467,5 +564,51 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "600",
+  },
+  descriptionInput: {
+    backgroundColor: '#1a1a1a',
+    borderRadius: 12,
+    padding: 16,
+    color: '#fff',
+    fontSize: 16,
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  characterCount: {
+    color: '#666',
+    fontSize: 12,
+    textAlign: 'right',
+    marginTop: 8,
+  },
+  sectionSubtitle: {
+    color: '#666',
+    fontSize: 14,
+    marginTop: 2,
+  },
+  pgnContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  toggle: {
+    width: 50,
+    height: 30,
+    borderRadius: 15,
+    backgroundColor: '#333',
+    justifyContent: 'center',
+    paddingHorizontal: 2,
+  },
+  toggleActive: {
+    backgroundColor: '#14b8a6',
+  },
+  toggleThumb: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: '#fff',
+    alignSelf: 'flex-start',
+  },
+  toggleThumbActive: {
+    alignSelf: 'flex-end',
   },
 });

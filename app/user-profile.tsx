@@ -14,7 +14,7 @@ import { Stack, router, useLocalSearchParams } from "expo-router";
 import { ArrowLeft, Grid3x3, Heart, Lock, Share, MessageCircle, UserPlus, UserCheck } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
-import { mockUserVideos } from "@/mocks/profile";
+import { useZipplign } from '@/app/context/ZipplignProvider';
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const GRID_ITEM_WIDTH = (SCREEN_WIDTH - 4) / 3;
@@ -35,8 +35,13 @@ export default function UserProfileScreen() {
   const insets = useSafeAreaInsets();
   const { username, avatar } = useLocalSearchParams<{ username: string; avatar: string }>();
   const [activeTab, setActiveTab] = useState<"videos" | "liked">("videos");
-  const [isFollowing, setIsFollowing] = useState(false);
+  const { followedUsers, toggleFollow, posts } = useZipplign();
+  const isFollowing = followedUsers.has(username || '');
   const [refreshing, setRefreshing] = useState(false);
+
+  const getUserPosts = () => {
+    return posts.filter(post => post.username === username);
+  };
 
   // Mock user profile data - in real app, fetch based on username
   const userProfile: UserProfile = {
@@ -47,8 +52,8 @@ export default function UserProfileScreen() {
     following: "234",
     followers: "12.5K",
     likes: "456K",
-    videosCount: 89,
-    likesCount: 234,
+    videosCount: getUserPosts().length,
+    likesCount: getUserPosts().reduce((acc, post) => acc + parseInt(post.hearts.replace('K', '000').replace('M', '000000')), 0),
   };
 
   const handleHaptic = () => {
@@ -69,7 +74,9 @@ export default function UserProfileScreen() {
 
   const handleFollowPress = () => {
     handleHaptic();
-    setIsFollowing(!isFollowing);
+    if (username) {
+      toggleFollow(username);
+    }
   };
 
   const handleMessagePress = () => {
@@ -98,13 +105,23 @@ export default function UserProfileScreen() {
   ];
 
   const getTabVideos = () => {
+    const userPosts = getUserPosts();
     switch (activeTab) {
       case "videos":
-        return mockUserVideos;
+        return userPosts.map(post => ({
+          id: post.id,
+          thumbnail: post.thumbnail,
+          views: post.hearts,
+        }));
       case "liked":
-        return mockUserVideos.slice(0, 6);
+        // In a real app, you'd fetch liked videos from the backend
+        return userPosts.slice(0, 6).map(post => ({
+          id: post.id,
+          thumbnail: post.thumbnail,
+          views: post.hearts,
+        }));
       default:
-        return mockUserVideos;
+        return [];
     }
   };
 
