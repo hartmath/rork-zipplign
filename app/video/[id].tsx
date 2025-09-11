@@ -278,8 +278,7 @@ export default function VideoScreen() {
                 style={styles.remixButton} 
                 onPress={() => handleRemix(videoData.id)}
               >
-                <Zap size={24} color="#000" strokeWidth={2} />
-                <Text style={styles.remixText}>Ride my Zip</Text>
+                <Zap size={28} color="#14b8a6" strokeWidth={2} />
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.musicButton} onPress={handleHaptic}>
@@ -484,19 +483,8 @@ const styles = StyleSheet.create({
     // Animation container
   },
   remixButton: {
-    backgroundColor: '#14b8a6',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 20,
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginTop: 8,
-  },
-  remixText: {
-    color: '#000',
-    fontSize: 12,
-    fontWeight: '600',
+    gap: 2,
   },
   modalContainer: {
     flex: 1,
