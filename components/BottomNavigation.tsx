@@ -8,6 +8,11 @@ export default function BottomNavigation() {
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
 
+  // Hide bottom navigation on chat page
+  if (pathname === '/chat') {
+    return null;
+  }
+
   const isActive = (path: string) => {
     if (path === '/(tabs)' && (pathname === '/' || pathname === '/(tabs)')) return true;
     if (path !== '/(tabs)' && pathname.includes(path.replace('/(tabs)/', ''))) return true;
