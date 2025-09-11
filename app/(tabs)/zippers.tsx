@@ -28,7 +28,7 @@ import { useRefresh } from "./_layout";
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 
-export default function HomeScreen() {
+export default function ZippersScreen() {
   const insets = useSafeAreaInsets();
   const { setRefreshTrigger } = useRefresh();
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
@@ -183,7 +183,7 @@ export default function HomeScreen() {
     handleHaptic();
     
     setTimeout(() => {
-      console.log('Refreshed feed');
+      console.log('Refreshed zippers feed');
       setRefreshing(false);
     }, 1500);
   }, []);
@@ -201,8 +201,8 @@ export default function HomeScreen() {
       case 'Store':
         router.push('/store');
         break;
-      case 'Zippers':
-        router.push('/zippers');
+      case 'For you':
+        router.push('/');
         break;
       case 'Live':
         router.push('/live');
@@ -247,11 +247,11 @@ export default function HomeScreen() {
               <TouchableOpacity style={styles.navItem} onPress={() => handleNavPress('Store')}>
                 <Text style={styles.navText}>Store</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.navItem} onPress={() => handleNavPress('Zippers')}>
-                <Text style={styles.navText}>Zippers</Text>
+              <TouchableOpacity style={[styles.navItem, styles.activeNavItem]} onPress={() => handleNavPress('Zippers')}>
+                <Text style={[styles.navText, styles.activeNavText]}>Zippers</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.navItem, styles.activeNavItem]} onPress={() => handleNavPress('For you')}>
-                <Text style={[styles.navText, styles.activeNavText]}>For you</Text>
+              <TouchableOpacity style={styles.navItem} onPress={() => handleNavPress('For you')}>
+                <Text style={styles.navText}>For you</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.navItem} onPress={() => handleNavPress('Live')}>
                 <Text style={styles.navText}>Live</Text>
@@ -326,8 +326,6 @@ export default function HomeScreen() {
                 <Share2 size={28} color="#fff" strokeWidth={2} />
                 <Text style={styles.actionText}>{item.shares}</Text>
               </TouchableOpacity>
-
-
 
               <TouchableOpacity style={styles.musicButton} onPress={handleHaptic}>
                 <Animated.View style={[styles.musicAnimation, {
@@ -541,6 +539,25 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
+  zipButton: {
+    alignItems: "center",
+    gap: 2,
+  },
+  zipButtonInner: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#fbbf24",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#fff",
+  },
+  zipButtonText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   musicButton: {
     width: 48,
     height: 48,
@@ -576,6 +593,19 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 13,
     flex: 1,
+  },
+  pgnBadge: {
+    backgroundColor: "#dc2626",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+    marginTop: 4,
+  },
+  pgnText: {
+    color: "#fff",
+    fontSize: 10,
+    fontWeight: "bold",
   },
   activeNavItem: {
     borderBottomWidth: 2,
@@ -658,38 +688,6 @@ const styles = StyleSheet.create({
   },
   sendButton: {
     padding: 8,
-  },
-  zipButton: {
-    alignItems: "center",
-    gap: 2,
-  },
-  zipButtonInner: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#fbbf24",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 2,
-    borderColor: "#fff",
-  },
-  zipButtonText: {
-    color: "#000",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  pgnBadge: {
-    backgroundColor: "#dc2626",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: "flex-start",
-    marginTop: 4,
-  },
-  pgnText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
   },
   pipContainer: {
     position: 'absolute',

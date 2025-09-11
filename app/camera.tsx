@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,19 +8,25 @@ import {
   Image,
   Platform,
   Alert,
+  Animated,
 } from "react-native";
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
 import { X, RotateCw, Zap, Music, Timer, Sparkles } from "lucide-react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import * as Haptics from "expo-haptics";
 
 export default function CameraScreen() {
+  const { zipId } = useLocalSearchParams();
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [isRecording, setIsRecording] = useState(false);
   const [flashMode, setFlashMode] = useState(false);
   const [timer, setTimer] = useState(0);
+  const [countdown, setCountdown] = useState(0);
+  const [showCountdown, setShowCountdown] = useState(false);
   const cameraRef = useRef<CameraView>(null);
+  const countdownAnimation = useRef(new Animated.Value(1)).current;
+  const isZipMode = !!zipId;
 
   const handleHaptic = () => {
     if (Platform.OS !== 'web') {
@@ -38,34 +44,73 @@ export default function CameraScreen() {
     setFlashMode(!flashMode);
   };
 
+  const startCountdown = () => {
+    setShowCountdown(true);
+    setCountdown(5);
+    
+    const countdownInterval = setInterval(() => {
+      setCountdown(prev => {
+        if (prev <= 1) {
+          clearInterval(countdownInterval);
+          setShowCountdown(false);
+          startRecording();
+          return 0;
+        }
+        
+        // Animate countdown
+        Animated.sequence([
+          Animated.timing(countdownAnimation, {
+            toValue: 1.5,
+            duration: 200,
+            useNativeDriver: true,
+          }),
+          Animated.timing(countdownAnimation, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]).start();
+        
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  const startRecording = () => {
+    setIsRecording(true);
+    handleHaptic();
+    
+    // Start timer
+    const interval = setInterval(() => {
+      setTimer(prev => {
+        const maxTime = isZipMode ? 180 : 60; // 3 minutes for zip mode, 1 minute for regular
+        if (prev >= maxTime) {
+          clearInterval(interval);
+          setIsRecording(false);
+          if (Platform.OS !== 'web') {
+            Alert.alert('Recording Complete', `Maximum recording time reached! ${isZipMode ? 'Your Zippclip' : 'Your video'} has been saved.`);
+          } else {
+            console.log('Recording complete - maximum time reached!');
+          }
+          return 0;
+        }
+        return prev + 1;
+      });
+    }, 1000);
+  };
+
   const handleRecord = async () => {
     handleHaptic();
     if (isRecording) {
       setIsRecording(false);
       setTimer(0);
       if (Platform.OS !== 'web') {
-        Alert.alert('Recording Stopped', 'Your video has been saved!');
+        Alert.alert('Recording Stopped', `Your ${isZipMode ? 'Zippclip' : 'video'} has been saved!`);
       } else {
         console.log('Recording stopped - video saved!');
       }
     } else {
-      setIsRecording(true);
-      // Start timer
-      const interval = setInterval(() => {
-        setTimer(prev => {
-          if (prev >= 60) {
-            clearInterval(interval);
-            setIsRecording(false);
-            if (Platform.OS !== 'web') {
-              Alert.alert('Recording Complete', 'Maximum recording time reached!');
-            } else {
-              console.log('Recording complete - maximum time reached!');
-            }
-            return 0;
-          }
-          return prev + 1;
-        });
-      }, 1000);
+      startCountdown();
     }
   };
 
@@ -114,6 +159,11 @@ export default function CameraScreen() {
             style={styles.logo}
           />
           <Text style={styles.appName}>zipp</Text>
+          {isZipMode && (
+            <View style={styles.zipModeIndicator}>
+              <Text style={styles.zipModeText}>ZIP MODE</Text>
+            </View>
+          )}
         </View>
         
         <View style={styles.headerOptions}>
@@ -129,10 +179,22 @@ export default function CameraScreen() {
         </View>
       </View>
 
+      {showCountdown && (
+        <View style={styles.countdownContainer}>
+          <Animated.View style={[styles.countdownCircle, { transform: [{ scale: countdownAnimation }] }]}>
+            <Text style={styles.countdownText}>{countdown}</Text>
+          </Animated.View>
+          <Text style={styles.countdownLabel}>{isZipMode ? 'Get ready to Zipp!' : 'Get ready!'}</Text>
+        </View>
+      )}
+
       {isRecording && (
         <View style={styles.recordingIndicator}>
           <View style={styles.recordingDot} />
-          <Text style={styles.recordingText}>REC {formatTime(timer)}</Text>
+          <Text style={styles.recordingText}>
+            {isZipMode ? 'ZIPPING' : 'REC'} {formatTime(timer)}
+            {isZipMode && ` / ${formatTime(180)}`}
+          </Text>
         </View>
       )}
 
@@ -149,10 +211,23 @@ export default function CameraScreen() {
         </TouchableOpacity>
         
         <TouchableOpacity 
-          style={[styles.recordButton, isRecording && styles.recordingButton]} 
+          style={[
+            styles.recordButton, 
+            isRecording && styles.recordingButton,
+            isZipMode && styles.zipRecordButton
+          ]} 
           onPress={handleRecord}
+          disabled={showCountdown}
         >
-          <View style={[styles.recordButtonInner, isRecording && styles.recordingButtonInner]} />
+          <View style={[
+            styles.recordButtonInner, 
+            isRecording && styles.recordingButtonInner,
+            isZipMode && !isRecording && styles.zipRecordButtonInner
+          ]}>
+            {isZipMode && !isRecording && (
+              <Text style={styles.zipRecordText}>Z</Text>
+            )}
+          </View>
         </TouchableOpacity>
         
         <TouchableOpacity style={styles.sideButton} onPress={toggleFlash}>
@@ -305,5 +380,60 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: 40,
     height: 40,
+  },
+  zipModeIndicator: {
+    backgroundColor: "#fbbf24",
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginLeft: 8,
+  },
+  zipModeText: {
+    color: "#000",
+    fontSize: 10,
+    fontWeight: "bold",
+  },
+  countdownContainer: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: [{ translateX: -75 }, { translateY: -75 }],
+    alignItems: "center",
+    zIndex: 20,
+  },
+  countdownCircle: {
+    width: 150,
+    height: 150,
+    borderRadius: 75,
+    backgroundColor: "rgba(20, 184, 166, 0.9)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 4,
+    borderColor: "#fff",
+  },
+  countdownText: {
+    color: "#fff",
+    fontSize: 60,
+    fontWeight: "bold",
+  },
+  countdownLabel: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 16,
+    textAlign: "center",
+  },
+  zipRecordButton: {
+    borderColor: "#fbbf24",
+  },
+  zipRecordButtonInner: {
+    backgroundColor: "#fbbf24",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  zipRecordText: {
+    color: "#000",
+    fontSize: 24,
+    fontWeight: "bold",
   },
 });

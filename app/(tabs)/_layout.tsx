@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Home, Search, MessageCircle, User } from "lucide-react-native";
+import { Home, Search, MessageCircle, User, Users } from "lucide-react-native";
 import React, { useState, useMemo } from "react";
 import { View, StyleSheet, Image, TouchableOpacity, Platform } from "react-native";
 import * as Haptics from "expo-haptics";
@@ -69,6 +69,15 @@ function TabLayoutContent() {
           title: "Discover",
           tabBarIcon: ({ color, focused }) => (
             <Search size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="zippers"
+        options={{
+          title: "Zippers",
+          tabBarIcon: ({ color, focused }) => (
+            <Users size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
           ),
         }}
       />

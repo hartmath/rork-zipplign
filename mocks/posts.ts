@@ -13,6 +13,9 @@ export const mockPosts: Post[] = [
     comments: "1.2K",
     shares: "892",
     bookmarks: "12K",
+    hearts: "245K",
+    zippers: "89",
+    duration: 45,
     isRemix: true,
     originalPost: {
       id: "original_1",
@@ -34,6 +37,9 @@ export const mockPosts: Post[] = [
     comments: "3.4K",
     shares: "567",
     bookmarks: "45K",
+    hearts: "89K",
+    zippers: "156",
+    duration: 38,
     isRemix: true,
     originalPost: {
       id: "original_2",
@@ -55,6 +61,9 @@ export const mockPosts: Post[] = [
     comments: "8.9K",
     shares: "23K",
     bookmarks: "78K",
+    hearts: "567K",
+    zippers: "234",
+    duration: 52,
     isRemix: true,
     originalPost: {
       id: "original_3",
@@ -76,6 +85,9 @@ export const mockPosts: Post[] = [
     comments: "2.1K",
     shares: "4.5K",
     bookmarks: "34K",
+    hearts: "123K",
+    zippers: "67",
+    duration: 41,
     isRemix: true,
     originalPost: {
       id: "original_4",
@@ -97,6 +109,9 @@ export const mockPosts: Post[] = [
     comments: "5.6K",
     shares: "12K",
     bookmarks: "89K",
+    hearts: "234K",
+    zippers: "178",
+    duration: 33,
     isRemix: true,
     originalPost: {
       id: "original_5",
@@ -118,6 +133,9 @@ export const mockPosts: Post[] = [
     comments: "7.8K",
     shares: "15K",
     bookmarks: "123K",
+    hearts: "456K",
+    zippers: "298",
+    duration: 47,
     isRemix: true,
     originalPost: {
       id: "original_6",
@@ -139,6 +157,9 @@ export const mockPosts: Post[] = [
     comments: "2.3K",
     shares: "1.2K",
     bookmarks: "8.9K",
+    hearts: "89K",
+    zippers: "45",
+    duration: 29,
     isRemix: true,
     originalPost: {
       id: "1",
@@ -160,6 +181,9 @@ export const mockPosts: Post[] = [
     comments: "4.7K",
     shares: "8.2K",
     bookmarks: "23K",
+    hearts: "156K",
+    zippers: "78",
+    duration: 36,
     isRemix: true,
     originalPost: {
       id: "3",
@@ -181,6 +205,9 @@ export const mockPosts: Post[] = [
     comments: "1.8K",
     shares: "892",
     bookmarks: "12K",
+    hearts: "67K",
+    zippers: "34",
+    duration: 42,
     isRemix: true,
     originalPost: {
       id: "2",
@@ -202,6 +229,9 @@ export const mockPosts: Post[] = [
     comments: "3.2K",
     shares: "5.6K",
     bookmarks: "28K",
+    hearts: "134K",
+    zippers: "92",
+    duration: 39,
     isRemix: true,
     originalPost: {
       id: "5",
@@ -223,6 +253,9 @@ export const mockPosts: Post[] = [
     comments: "6.1K",
     shares: "11K",
     bookmarks: "45K",
+    hearts: "298K",
+    zippers: "167",
+    duration: 44,
     isRemix: true,
     originalPost: {
       id: "6",
@@ -244,6 +277,9 @@ export const mockPosts: Post[] = [
     comments: "1.9K",
     shares: "3.4K",
     bookmarks: "19K",
+    hearts: "78K",
+    zippers: "56",
+    duration: 37,
     isRemix: true,
     originalPost: {
       id: "4",
