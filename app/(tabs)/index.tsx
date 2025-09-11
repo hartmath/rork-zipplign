@@ -253,12 +253,18 @@ export default function HomeScreen() {
 
           <View style={[styles.content, { paddingBottom: insets.bottom + 60 }]}>
             <View style={styles.sidebar}>
-              <TouchableOpacity style={styles.profileButton} onPress={() => toggleFollow(item.username)}>
+              <TouchableOpacity style={styles.profileButton} onPress={() => router.push(`/user-profile?username=${item.username}&avatar=${encodeURIComponent(item.userAvatar)}`)}>
                 <Image source={{ uri: item.userAvatar }} style={styles.avatar} />
                 {!isFollowed && (
-                  <View style={styles.followButton}>
+                  <TouchableOpacity 
+                    style={styles.followButton}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      toggleFollow(item.username);
+                    }}
+                  >
                     <Text style={styles.followText}>+</Text>
-                  </View>
+                  </TouchableOpacity>
                 )}
               </TouchableOpacity>
 
@@ -317,7 +323,9 @@ export default function HomeScreen() {
             </View>
 
             <View style={styles.footer}>
-              <Text style={styles.username}>@{item.username}</Text>
+              <TouchableOpacity onPress={() => router.push(`/user-profile?username=${item.username}&avatar=${encodeURIComponent(item.userAvatar)}`)}>
+                <Text style={styles.username}>@{item.username}</Text>
+              </TouchableOpacity>
               <Text style={styles.description} numberOfLines={2}>
                 {item.description}
               </Text>
@@ -378,9 +386,19 @@ export default function HomeScreen() {
           <ScrollView style={styles.commentsContainer}>
             {selectedPostId && getPostComments(selectedPostId).map((comment) => (
               <View key={comment.id} style={styles.commentItem}>
-                <Image source={{ uri: comment.avatar }} style={styles.commentAvatar} />
+                <TouchableOpacity onPress={() => {
+                  closeCommentModal();
+                  router.push(`/user-profile?username=${comment.username}&avatar=${encodeURIComponent(comment.avatar)}`);
+                }}>
+                  <Image source={{ uri: comment.avatar }} style={styles.commentAvatar} />
+                </TouchableOpacity>
                 <View style={styles.commentContent}>
-                  <Text style={styles.commentUsername}>@{comment.username}</Text>
+                  <TouchableOpacity onPress={() => {
+                    closeCommentModal();
+                    router.push(`/user-profile?username=${comment.username}&avatar=${encodeURIComponent(comment.avatar)}`);
+                  }}>
+                    <Text style={styles.commentUsername}>@{comment.username}</Text>
+                  </TouchableOpacity>
                   <Text style={styles.commentText}>{comment.text}</Text>
                 </View>
               </View>
