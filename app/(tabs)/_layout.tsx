@@ -1,10 +1,47 @@
 import { Tabs } from "expo-router";
 import { Home, Search, MessageCircle, User } from "lucide-react-native";
-import React from "react";
-import { View, StyleSheet, Image } from "react-native";
+import React, { useState, useMemo } from "react";
+import { View, StyleSheet, Image, TouchableOpacity, Platform } from "react-native";
+import * as Haptics from "expo-haptics";
+import createContextHook from '@nkzw/create-context-hook';
 
-export default function TabLayout() {
+export const [RefreshProvider, useRefresh] = createContextHook(() => {
+  const [refreshTrigger, setRefreshTrigger] = useState<(() => void) | null>(null);
 
+  const triggerRefresh = () => {
+    if (refreshTrigger) {
+      refreshTrigger();
+    }
+  };
+
+  const setRefreshTriggerFn = (fn: () => void) => {
+    setRefreshTrigger(() => fn);
+  };
+
+  return useMemo(() => ({
+    triggerRefresh,
+    setRefreshTrigger: setRefreshTriggerFn
+  }), [refreshTrigger]);
+});
+
+function CustomHomeIcon({ color, focused }: { color: string; focused: boolean }) {
+  const { triggerRefresh } = useRefresh();
+
+  const handlePress = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    triggerRefresh();
+  };
+
+  return (
+    <TouchableOpacity onPress={handlePress} activeOpacity={0.7}>
+      <Home size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+    </TouchableOpacity>
+  );
+}
+
+function TabLayoutContent() {
   return (
     <Tabs
       screenOptions={{
@@ -22,7 +59,7 @@ export default function TabLayout() {
         options={{
           title: "Home",
           tabBarIcon: ({ color, focused }) => (
-            <Home size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+            <CustomHomeIcon color={color} focused={focused} />
           ),
         }}
       />
@@ -70,6 +107,14 @@ export default function TabLayout() {
         }}
       />
     </Tabs>
+  );
+}
+
+export default function TabLayout() {
+  return (
+    <RefreshProvider>
+      <TabLayoutContent />
+    </RefreshProvider>
   );
 }
 

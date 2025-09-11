@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
   View,
   Text,
@@ -24,11 +24,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import * as Haptics from "expo-haptics";
 import { mockPosts } from "@/mocks/posts";
 import type { Post } from "@/types/post";
+import { useRefresh } from "./_layout";
 
 const { height: SCREEN_HEIGHT, width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const { setRefreshTrigger } = useRefresh();
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const [bookmarkedPosts, setBookmarkedPosts] = useState<Set<string>>(new Set());
   const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
@@ -185,6 +187,10 @@ export default function HomeScreen() {
       setRefreshing(false);
     }, 1500);
   }, []);
+
+  useEffect(() => {
+    setRefreshTrigger(onRefresh);
+  }, [onRefresh, setRefreshTrigger]);
 
   const handleNavPress = (nav: string) => {
     handleHaptic();
